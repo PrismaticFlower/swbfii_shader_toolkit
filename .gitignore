@@ -1,0 +1,13 @@
+﻿# Ignore .vs folder, I use it with Open Folder for editing HLSL files.
+.vs/
+
+# Ignore folders used during the compile process
+build/asm/
+build/xml/
+
+# Ignore munged files folders
+build/munged/
+build/premunged/
+
+# Ignore resulting core.lvl
+core.lvl

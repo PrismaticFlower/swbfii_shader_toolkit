@@ -1,0 +1,79 @@
+ucft
+{
+   REQN
+   {
+      "munged"
+      "chunk_0"
+      "chunk_1"
+   }
+
+   REQN
+   {
+      "font"
+      "gamefont_medium"
+      "gamefont_small"
+      "gamefont_super_tiny"
+      "gamefont_tiny"
+      "gamefont_large"
+   }
+
+   REQN
+   {
+      "loc"
+      "italian"
+      "uk_english"
+      "spanish"
+      "french"
+      "english"
+      "german"
+   }
+
+   REQN
+   {
+      "shader"
+      "detail"
+      "decal"
+      "hdr"
+      "interface"
+      "filtercopy"
+      "flare"
+      "foliage"
+      "normal"
+      "normalmapadder"
+      "ocean"
+      "particle"
+      "perpixeldiffuselighting"
+      "pervertexdiffuselighting"
+      "prereflection"
+      "rain"
+      "refraction"
+      "sample"
+      "scroll"
+      "shadowquad"
+      "shield"
+      "skyfog"
+      "bump"
+      "specmap"
+      "specularlighting"
+      "sprite"
+      "stencilshadow"
+      "Terrain2"
+      "lightbeam"
+      "water"
+      "zprepass"
+   }
+
+   REQN
+   {
+      "texture"
+      "attenuation_volume"
+      "cube_normalizationmap"
+      "default_spotlight"
+      "hemisphere_normalizationmap"
+      "linear_ramp"
+      "null_detailmap"
+      "specularcubemap"
+      "specularspot"
+      "white"
+   }
+}
