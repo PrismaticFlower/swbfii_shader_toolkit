@@ -3,6 +3,12 @@
 
 #include "constants_list.hlsl"
 
+struct Near_scene
+{
+   float view_z;
+   float fade;
+};
+
 float4 decompress_position(float4 position)
 {
    position = position_decompress_min * position;
@@ -37,6 +43,15 @@ float4 pos_project(float4 position)
 float4 pos_to_world_project(float4 position)
 {
    return pos_project(pos_to_world(position));
+}
+
+Near_scene calculate_near_scene_fade(float4 position)
+{
+   Near_scene result;
+   result.view_z = dot(position, projection_matrix[3]);
+   result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
+
+   return result;
 }
 
 #endif

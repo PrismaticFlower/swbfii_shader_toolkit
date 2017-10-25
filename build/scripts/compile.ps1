@@ -44,7 +44,6 @@ $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\rain.xml"
 
-
 ### Shadowquad Shader ###
 
 compile_pass "shadowquad" "shadowquad_vs" "shadowquad_ps"
@@ -58,3 +57,17 @@ $shader += end_shader_state
 $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\shadowquad.xml"
+
+### Sprite Shader ###
+
+compile_pass "sprite" "sprite_vs" "sprite_ps"
+
+$shader = start_xml_shader "sprite"  
+
+$shader += start_shader_state 0
+$shader += add_state_pass "sprite" "sprite_vs" "sprite_ps"
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\sprite.xml"
