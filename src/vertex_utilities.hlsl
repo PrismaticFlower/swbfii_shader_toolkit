@@ -9,6 +9,11 @@ float4 decompress_position(float4 position, Position_decompress position_decompr
    return position_decompress.max_pos + position; 
 }
 
+float2 decompress_texcoords(float4 texcoord, float4 tex_decompress)
+{
+   return (texcoord * tex_decompress.zzzw).xy;    
+}
+
 float4 get_material_color(float4 color, float4 color_state)
 {
    return color * color_state.yyyw + color_state.xxxz;

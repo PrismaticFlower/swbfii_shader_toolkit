@@ -13,7 +13,7 @@ function global:load_asm_shader ($path, $type)
 
 function global:start_xml_shader ($rendertype, $skinned)
 {
-    '<?xml version="1.0" encoding="utf-8" ?><shader rendertype="' + $rendertype + '" skinned="' + $skinned + '" debuginfo="no"><pipeline id="2">' 
+    '<?xml version="1.0" encoding="utf-8" ?><shader rendertype="' + $rendertype + '" skinned="no" debuginfo="no"><pipeline id="2">' 
 }
 
 function global:end_xml_shader 
