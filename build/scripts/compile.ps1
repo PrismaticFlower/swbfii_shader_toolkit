@@ -16,3 +16,20 @@ $shader += end_shader_state
 $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\rain.xml"
+
+
+### Shadowquad Shader ###
+
+compile_pass "shadowquad" "shadowquad_vs" "shadowquad_ps"
+
+$shader = start_xml_shader "shadowquad" "no"   
+
+$shader += start_shader_state 0
+
+$shader += add_state_pass "shadowquad" "shadowquad_vs" "shadowquad_ps"
+
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\shadowquad.xml"
