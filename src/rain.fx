@@ -14,11 +14,6 @@ struct Vs_output
    float4 color : COLOR;
 };
 
-struct Ps_output
-{
-   float4 color : COLOR;
-};
-
 Vs_output rain_vs(Vs_input input)
 {
    float4 position = decompress_position(input.position, position_decompress);
@@ -32,10 +27,7 @@ Vs_output rain_vs(Vs_input input)
    return output;
 }
 
-Ps_output rain_ps(float4 color : COLOR)
+float4 rain_ps(float4 color : COLOR) : COLOR
 {
-   Ps_output output;
-   output.color = color;
-
-   return output;    
+   return color;
 }
