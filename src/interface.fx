@@ -2,15 +2,14 @@
 #include "constants_list.hlsl"
 #include "vertex_utilities.hlsl"
 
-float4 interface_transform_const : register(vs, c[40]);
+float4 interface_transform_const : register(vs, c[CUSTOM_CONST_MIN]);
 
 sampler bitmap_sampler;
 sampler mask_sampler;
 
 float4 project_interface_pos(float4 position)
 {
-   position = pos_to_world(position, world_matrix);
-   position = pos_project(position, projection_matrix);
+   position = pos_to_world_project(position);
 
    position.xy = position.xy * interface_transform_const.xy + interface_transform_const.zw;
 
@@ -45,8 +44,8 @@ Vs_masked_output masked_bitmap_vs(Vs_masked_input input)
     
    output.position = project_interface_pos(input.position);
 
-   output.texcoord_0 = decompress_texcoords(input.texcoord_0, normaltex_decompress);
-   output.texcoord_1 = decompress_texcoords(input.texcoord_1, normaltex_decompress);
+   output.texcoord_0 = decompress_texcoords(input.texcoord_0);
+   output.texcoord_1 = decompress_texcoords(input.texcoord_1);
 
    return output;
 }
@@ -119,7 +118,7 @@ Vs_textured_output bitmap_textured_vs(Vs_textured_input input)
 
    output.position = project_interface_pos(input.position);
 
-   output.texcoord = decompress_texcoords(input.texcoord, normaltex_decompress);
+   output.texcoord = decompress_texcoords(input.texcoord);
 
    return output;
 }

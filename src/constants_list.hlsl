@@ -1,8 +1,6 @@
 #ifndef CONSTANTS_LIST_INCLUDED
 #define CONSTANTS_LIST_INCLUDED
 
-#include "types.hlsl"
-
 // This file is a listing of SWBFII's shader constants/uniforms as in 
 // pcredvertexshaderconstants.h. Along with the comments on the contents
 // of the constants.
@@ -37,8 +35,9 @@ float4x3 shadow_map_transform : register(vs, c[9]);
 float4 normaltex_decompress : register(vs, c[12]);
 
 // min_pos = ((bbox (max - min) * 0.5 / 0x7FFF) or (1, 1, 1), 0)
+float4 position_decompress_min : register(vs, c[13]);
 // max_pos = ((bbox (max + min) * 0.5 / 0x7FFF) or (0, 0, 0), 1)
-Position_decompress position_decompress : register(vs, c[13]);
+float4 position_decompress_max : register(vs, c[14]);
 
 // Pandemic: whether vertex colors are lighting or material colors
 // (1, 0, 0, 0)
@@ -124,6 +123,8 @@ float4x4 light_proj_matrix : register(vs, c[35]);
 float4 material_diffuse_color : register(vs, c[39]);
 
 // registers 40 to 50 are set aside as "custom constants"
+#define CUSTOM_CONST_MIN 40
+#define CUSTOM_CONST_MAX 50
 
 // bone matrices
 float4x3 bone_matrix[15] : register(vs, c[51]);

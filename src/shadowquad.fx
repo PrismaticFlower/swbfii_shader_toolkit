@@ -1,10 +1,9 @@
 
-#include "constants_list.hlsl"
 #include "vertex_utilities.hlsl"
 
 float4 shadowquad_vs(float4 position : POSITION) : POSITION
 {
-   position = decompress_position(position, position_decompress);
+   position = decompress_position(position);
     
    return float4(position.xy, constant_0.yz);
 
