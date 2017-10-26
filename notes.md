@@ -7,6 +7,9 @@ __Tested__ I am fairly certain work correctly.
 * sprite
 * sample
 
+## Tested Unsure
+* lightbeam
+
 ## Tested
 * rain
 * interface

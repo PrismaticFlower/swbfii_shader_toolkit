@@ -32,7 +32,7 @@ float4 get_static_diffuse_color(float4 color)
 
 float4 pos_to_world(float4 position)
 {
-   return float4(mul(position, world_matrix), 1.0);
+   return float4(mul(position, world_matrix), constant_0.z);
 }
 
 float4 pos_project(float4 position)
@@ -45,13 +45,35 @@ float4 pos_to_world_project(float4 position)
    return pos_project(pos_to_world(position));
 }
 
-Near_scene calculate_near_scene_fade(float4 position)
+float4 decompress_pos_to_world(float4 position)
+{
+   return pos_to_world(decompress_position(position));
+}
+
+Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;
-   result.view_z = dot(position, projection_matrix[3]);
+   result.view_z = dot(world_position, projection_matrix[3]);
    result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
 
    return result;
+}
+
+Near_scene clamp_near_scene_fade(Near_scene near_scene)
+{
+   near_scene.fade = max(near_scene.fade, constant_0.x);
+   near_scene.fade = min(near_scene.fade, constant_0.z);
+   near_scene.fade = near_scene.fade * near_scene.fade;
+
+   return near_scene;
+}
+
+float calculate_fog(Near_scene near_scene, float4 world_position)
+{
+   float x = near_scene.view_z * fog_info.x + fog_info.y;
+   float y = world_position.y * fog_info.z + fog_info.w;
+
+   return min(x, y);
 }
 
 #endif

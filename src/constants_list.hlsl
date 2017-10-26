@@ -21,12 +21,12 @@ float4 world_view_position : register(vs, c[6]);
 float4 fog_info : register(vs, c[7]);
 
 // (nearfade scale, nearfade offset, lighting scale, 1.0)
-float4 near_scene_fade : register(vs, c[7]);
+float4 near_scene_fade : register(vs, c[8]);
 
 // uses the same register as near_scene_fade, so may be no different or
 // it might be. The original authors of the shaders made the distinction
 // so this does as well.
-float4 hdr_info : register(vs, c[7]);
+#define hdr_info near_scene_fade
 
 // shadow map transform
 float4x3 shadow_map_transform : register(vs, c[9]);

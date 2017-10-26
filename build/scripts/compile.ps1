@@ -31,6 +31,19 @@ $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\interface.xml"
 
+### Lightbeam Shader ###
+
+compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
+
+$shader = start_xml_shader "lightbeam"   
+
+$shader += start_shader_state 0
+$shader += add_state_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\lightbeam.xml"
 
 ### Rain Shader ###
 
