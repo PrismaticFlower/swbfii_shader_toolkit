@@ -87,6 +87,20 @@ $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\shadowquad.xml"
 
+### Skyfog Shader ###
+
+compile_pass "skyfog" "skyfog_vs" "skyfog_ps"
+
+$shader = start_xml_shader "skyfog"  
+
+$shader += start_shader_state 0
+$shader += add_state_pass "skyfog" "skyfog_vs" "skyfog_ps"
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\skyfog.xml"
+
 ### Sprite Shader ###
 
 compile_pass "sprite" "sprite_vs" "sprite_ps"
