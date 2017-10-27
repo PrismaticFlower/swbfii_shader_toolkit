@@ -25,10 +25,12 @@ Vs_output lightbeam_vs(Vs_input input)
    output.position = pos_project(world_position);
    output.fog = calculate_fog(near_scene, world_position);
 
+   near_scene = clamp_near_scene_fade(near_scene);
+
    float4 material_color = get_material_color(input.color);
 
-   output.color.xyz = material_color.xyz * hdr_info.zzz;
-   output.color.w = material_color.w * near_scene.fade;
+   output.color.rgb = material_color.rgb * hdr_info.zzz;
+   output.color.a = material_color.a * near_scene.fade;
 
    return output;
 }

@@ -58,6 +58,7 @@ float4 decompress_pos_to_world_project(float4 position)
 Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;
+
    result.view_z = dot(world_position, projection_matrix[3]);
    result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
 
