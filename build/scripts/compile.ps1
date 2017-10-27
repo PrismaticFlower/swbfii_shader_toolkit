@@ -63,6 +63,25 @@ $shader += end_xml_shader
 
 $shader | Out-File -Encoding utf8 ".\build\xml\lightbeam.xml"
 
+### Prereflection Shader ###
+
+compile_pass "prereflection" "prereflection_vs" "prereflection_ps"
+compile_pass "prereflection" "prereflection_fake_stencil_vs" "prereflection_ps"
+
+$shader = start_xml_shader "prereflection"   
+
+$shader += start_shader_state 0
+$shader += add_state_pass "prereflection" "prereflection_vs" "prereflection_ps"
+$shader += end_shader_state
+
+$shader += start_shader_state 1
+$shader += add_state_pass "prereflection" "prereflection_fake_stencil_vs" "prereflection_ps"
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\prereflection.xml"
+
 ### Rain Shader ###
 
 compile_pass "rain" "rain_vs" "rain_ps"

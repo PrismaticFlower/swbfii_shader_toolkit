@@ -6,6 +6,7 @@ __Tested__ I am fairly certain work correctly.
 * shadowquad
 * sprite
 * sample
+* prereflection
 
 ## Tested Unsure
 * lightbeam
