@@ -27,7 +27,7 @@ Vs_textured_output flare_textured_vs(Vs_textured_input input)
 {
    Vs_textured_output output;
 
-   output.position = decompress_pos_to_world_project(input.position);
+   output.position = transform_unskinned_project(input.position);
    output.color = get_material_color(input.color) * hdr_info.zzzw;
    output.texcoord = decompress_texcoords(input.texcoord);
 
@@ -59,7 +59,7 @@ Vs_untextured_output flare_untextured_vs(Vs_untextured_input input)
 {
    Vs_untextured_output output;
 
-   output.position = decompress_pos_to_world_project(input.position);
+   output.position = transform_unskinned_project(input.position);
    output.color = get_material_color(input.color) * hdr_info.zzzw;
 
    return output;

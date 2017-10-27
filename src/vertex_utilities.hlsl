@@ -45,14 +45,14 @@ float4 pos_to_world_project(float4 position)
    return pos_project(pos_to_world(position));
 }
 
-float4 decompress_pos_to_world(float4 position)
+float4 transform_unskinned(float4 position)
 {
    return pos_to_world(decompress_position(position));
 }
 
-float4 decompress_pos_to_world_project(float4 position)
+float4 transform_unskinned_project(float4 position)
 {
-   return pos_project(pos_to_world(decompress_position(position)));
+   return pos_project(transform_unskinned(position));
 }
 
 Near_scene calculate_near_scene_fade(float4 world_position)
