@@ -1,8 +1,26 @@
 ﻿.\build\scripts\compile_helpers.ps1
 
 
-### Interface Shader ###
+### Flare Shader ###
 
+compile_pass "flare" "flare_textured_vs" "flare_textured_ps"
+compile_pass "flare" "flare_untextured_vs" "flare_untextured_ps"
+
+$shader = start_xml_shader "flare"
+
+$shader += start_shader_state 0
+$shader += add_state_pass "flare" "flare_textured_vs" "flare_textured_ps"
+$shader += end_shader_state
+
+$shader += start_shader_state 1
+$shader += add_state_pass "flare" "flare_untextured_vs" "flare_untextured_ps"
+$shader += end_shader_state
+
+$shader += end_xml_shader
+
+$shader | Out-File -Encoding utf8 ".\build\xml\flare.xml"
+
+### Interface Shader ###
 
 compile_pass "interface" "masked_bitmap_vs" "masked_bitmap_ps"
 compile_pass "interface" "vector_vs" "vector_ps"

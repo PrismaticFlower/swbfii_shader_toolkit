@@ -22,7 +22,7 @@ float2 decompress_texcoords(float4 texcoord)
 
 float4 get_material_color(float4 color)
 {
-   return color * color_state.yyyw + color_state.xxxz;
+   return (color * color_state.yyyw + color_state.xxxz) * material_diffuse_color;
 }
 
 float4 get_static_diffuse_color(float4 color)
@@ -48,6 +48,11 @@ float4 pos_to_world_project(float4 position)
 float4 decompress_pos_to_world(float4 position)
 {
    return pos_to_world(decompress_position(position));
+}
+
+float4 decompress_pos_to_world_project(float4 position)
+{
+   return pos_project(pos_to_world(decompress_position(position)));
 }
 
 Near_scene calculate_near_scene_fade(float4 world_position)

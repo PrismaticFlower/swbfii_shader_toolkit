@@ -14,3 +14,4 @@ __Tested__ I am fairly certain work correctly.
 * rain
 * interface
 * skyfog
+* flare
