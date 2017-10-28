@@ -15,11 +15,9 @@ struct Vs_output
 
 Vs_output rain_vs(Vs_input input)
 {
-   float4 position = decompress_position(input.position);
-
    Vs_output output;
     
-   output.position = pos_to_world_project(position);
+   output.position = transform_unskinned_project(position);
    output.color = get_material_color(input.color);
 
    return output;
