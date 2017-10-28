@@ -17,7 +17,7 @@ Vs_output rain_vs(Vs_input input)
 {
    Vs_output output;
     
-   output.position = transform_unskinned_project(position);
+   output.position = transform_unskinned_project(input.position);
    output.color = get_material_color(input.color);
 
    return output;
