@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "skyfog" skinned = "no" debuginfo = "no">
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "none" lighting = "none">
+        <vertexshader target = "vs_2_0">
+          ~skyfog_vs~
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~skyfog_ps~
+        </pixelshader>
+      </pass>
+    </state>
+  </pipeline>
+</shader>

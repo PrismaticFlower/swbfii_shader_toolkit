@@ -15,9 +15,9 @@ float4 decompress_position(float4 position)
    return position_decompress_max + position;
 }
 
-float2 decompress_texcoords(float4 texcoord)
+float2 decompress_texcoords(float4 texcoords)
 {
-   return (texcoord * normaltex_decompress.zzzw).xy;
+   return (texcoords * normaltex_decompress.zzzw).xy;
 }
 
 float4 get_material_color(float4 color)
@@ -28,6 +28,13 @@ float4 get_material_color(float4 color)
 float4 get_static_diffuse_color(float4 color)
 {
    return color * color_state.xxxz + color_state.zzzz;
+}
+
+float4 pos_to_skinned_object(float4 position, uint4 indices)
+{
+   int index = (indices.xyz * constant_1.www).x;
+
+   return float4(mul(position, bone_matrix[index]), constant_0.z);
 }
 
 float4 pos_to_world(float4 position)
@@ -53,6 +60,16 @@ float4 transform_unskinned(float4 position)
 float4 transform_unskinned_project(float4 position)
 {
    return pos_project(transform_unskinned(position));
+}
+
+float4 transform_skinned(float4 position, uint4 indices)
+{
+   return pos_to_world(pos_to_skinned_object(decompress_position(position), indices));
+}
+
+float4 transform_skinned_project(float4 position, uint4 indices)
+{
+   return pos_project(transform_skinned(position, indices));
 }
 
 Near_scene calculate_near_scene_fade(float4 world_position)

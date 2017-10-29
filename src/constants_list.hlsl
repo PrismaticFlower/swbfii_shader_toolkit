@@ -127,7 +127,7 @@ float4 material_diffuse_color : register(vs, c[39]);
 #define CUSTOM_CONST_MAX 50
 
 // bone matrices
-float4x3 bone_matrix[15] : register(vs, c[51]);
+float4x3 bone_matrix[16] : register(vs, c[51]);
 
 
 #endif

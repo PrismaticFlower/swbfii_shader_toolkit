@@ -1,43 +1,39 @@
-﻿function global:compile_pass($shader, $vs_func, $ps_func)
+﻿function global:compile_function($shader, $func_name, $profile)
 {
-    fxc /nologo /T vs_2_0 /E $vs_func /Fc "build/asm/${shader}_${vs_func}.asm" /O3 src/$shader.fx
-    fxc /nologo /T ps_2_0 /E $ps_func /Fc "build/asm/${shader}_${ps_func}.asm" /O3 src/$shader.fx
+    Write-Host "Compiling build\asm\${shader}_${func_name}.asm"
+
+    $function = fxc /nologo /T $profile /E $func_name /Cc /O3 /Zi src/$shader.fx
+
+    # Clean string so it is safe to pass through the munger.
+    $function = $function -replace $profile, ""
+    $function = $function -replace "#line", "// line"
+    $function = $function -replace "<", "("
+    $function = $function -replace ">", ")"
+
+    $function | Out-File -Encoding utf8 "build\asm\${shader}_${func_name}.asm"
 }
 
-function global:load_asm_shader ($path, $type)
+function global:compile_pass($shader, $vs_func, $ps_func)
 {
-    $body = Get-Content -Raw $path
-
-    $body -replace $type, ""
+    compile_function $shader $vs_func "vs_2_0"
+    compile_function $shader $ps_func "ps_2_0"
 }
 
-function global:start_xml_shader ($rendertype, $skinned)
+function global:instantiate_template($name)
 {
-    '<?xml version="1.0" encoding="utf-8" ?><shader rendertype="' + $rendertype + '" skinned="no" debuginfo="no"><pipeline id="2">' 
-}
+    Write-Host "Instantiating ${name}.xml.template"
 
-function global:end_xml_shader 
-{
-    '</pipeline></shader>'
-}
+    $template = Get-Content -Raw "build\templates\${name}.xml.template"
 
-function global:start_shader_state ([int] $index)
-{
-    '<state id="' + $index + '">' 
-}
+    $tokens = Select-String "~.+?~" -input $template -AllMatches
 
-function global:end_shader_state 
-{
-    '</state>'
-}
+    ForEach ($token in $tokens.matches)
+    {
+       $func = $token -replace "~", ""
+    
+       $asm = Get-Content -Raw "build\asm\${name}_${func}.asm"
+       $template = $template -replace $token, $asm
+    }
 
-function global:add_state_pass ($shader, $vs_func, $ps_func)
-{
-    $pass_body = '<pass transform="none" lighting="none"><vertexshader target="vs_2_0">!VS_BODY!</vertexshader><pixelshader target="ps_2_0">!PS_BODY!</pixelshader></pass>';
-
-    $vs_body = load_asm_shader "build/asm/${shader}_${vs_func}.asm" "vs_2_0"
-    $ps_body = load_asm_shader "build/asm/${shader}_${ps_func}.asm" "ps_2_0"
-
-    $pass_body =  $pass_body -replace "!VS_BODY!", $vs_body
-    $pass_body -replace "!PS_BODY!", $ps_body
+    $template | Out-File -Encoding utf8 ".\build\xml\$name.xml"
 }

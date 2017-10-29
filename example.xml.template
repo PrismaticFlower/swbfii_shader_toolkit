@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "" skinned = "no" debuginfo = "no">
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "position" lighting = "none">
+        <vertexshader target = "vs_2_0">
+
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+
+        </pixelshader>
+      </pass>
+    </state>
+  </pipeline>
+</shader>
