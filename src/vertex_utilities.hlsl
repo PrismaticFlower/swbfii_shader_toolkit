@@ -134,7 +134,10 @@ Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;
 
-   result.view_z = dot(world_position, projection_matrix[3]);
+   float4 projection = float4(projection_matrix[0].w, projection_matrix[1].w,
+                              projection_matrix[2].w, projection_matrix[3].w);
+
+   result.view_z = dot(world_position, projection);
    result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
 
    return result;
