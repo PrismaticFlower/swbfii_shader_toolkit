@@ -2,7 +2,7 @@
 {
     Write-Host "Compiling build\asm\${shader}_${func_name}.asm"
 
-    $function = fxc /nologo /T $profile /E $func_name /Cc /O3 /Zi src/$shader.fx
+    $function = fxc /nologo /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx
 
     # Clean string so it is safe to pass through the munger.
     $function = $function -replace $profile, ""

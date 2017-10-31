@@ -43,6 +43,17 @@ compile_pass "skyfog" "skyfog_vs" "skyfog_ps"
 
 compile_pass "sprite" "sprite_vs" "sprite_ps"
 
+### Z-Prepass Shader ###
+
+compile_function "zprepass" "opaque_hard_skinned_vs" "vs_2_0"
+compile_function "zprepass" "opaque_soft_skinned_vs" "vs_2_0"
+compile_function "zprepass" "opaque_unskinned_vs" "vs_2_0"
+compile_function "zprepass" "hardedged_hard_skinned_vs" "vs_2_0"
+compile_function "zprepass" "hardedged_soft_skinned_vs" "vs_2_0"
+compile_function "zprepass" "hardedged_unskinned_vs" "vs_2_0"
+compile_function "zprepass" "opaque_ps" "ps_2_0"
+compile_function "zprepass" "hardedged_ps" "ps_2_0"
+
 foreach ($file in Get-ChildItem -File -Path build\templates\* -Include *.xml.template)
 {
    $name = $file.Name -replace ".xml.template", ""

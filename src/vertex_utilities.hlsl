@@ -20,6 +20,19 @@ float2 decompress_texcoords(float4 texcoords)
    return (texcoords * normaltex_decompress.zzzw).xy;
 }
 
+float2 decompress_transform_texcoords(float4 texcoords, float4 x_transform, 
+                                      float4 y_transform)
+{
+   texcoords *= normaltex_decompress.zzzw;
+
+   float2 transformed;
+
+   transformed.x = dot(texcoords, x_transform);
+   transformed.y = dot(texcoords, y_transform);
+
+   return transformed;
+}
+
 float4 get_material_color(float4 color)
 {
    return (color * color_state.yyyw + color_state.xxxz) * material_diffuse_color;
@@ -30,11 +43,46 @@ float4 get_static_diffuse_color(float4 color)
    return color * color_state.xxxz + color_state.zzzz;
 }
 
-float4 pos_to_skinned_object(float4 position, uint4 indices)
+float4 pos_to_hard_skinned_object(float4 position, uint4 indices)
 {
    int index = (indices.xyz * constant_1.www).x;
 
-   return float4(mul(position, bone_matrix[index]), constant_0.z);
+   float4 result;
+
+   result.x = dot(position, bone_matrices[0 + index]);
+   result.y = dot(position, bone_matrices[1 + index]);
+   result.z = dot(position, bone_matrices[2 + index]);
+   result.w = constant_0.z;
+
+   return result;
+}
+
+float4 pos_to_skinned_object(float4 position, float4 weights, uint4 vertex_indices)
+{
+   int3 indices = vertex_indices.xyz * constant_1.www;
+
+   float4 skin_0 = weights.x * bone_matrices[0 + indices.x];
+   float4 skin_1 = weights.x * bone_matrices[1 + indices.x];
+   float4 skin_2 = weights.x * bone_matrices[2 + indices.x];
+
+   skin_0 += (weights.y *  bone_matrices[0 + indices.y]);
+   skin_1 += (weights.y *  bone_matrices[1 + indices.y]);
+   skin_2 += (weights.y *  bone_matrices[2 + indices.y]);
+
+   float z_weight = dot(weights, constant_0.wwxz);
+
+   skin_0 += (z_weight *  bone_matrices[0 + indices.y]);
+   skin_1 += (z_weight *  bone_matrices[1 + indices.y]);
+   skin_2 += (z_weight *  bone_matrices[2 + indices.y]);
+
+   float4 result;
+
+   result.x = dot(position, skin_0);
+   result.y = dot(position, skin_1);
+   result.z = dot(position, skin_2);
+   result.w = constant_0.z;
+
+   return result;
 }
 
 float4 pos_to_world(float4 position)
@@ -62,14 +110,24 @@ float4 transform_unskinned_project(float4 position)
    return pos_project(transform_unskinned(position));
 }
 
-float4 transform_skinned(float4 position, uint4 indices)
+float4 transform_hard_skinned(float4 position, uint4 indices)
 {
-   return pos_to_world(pos_to_skinned_object(decompress_position(position), indices));
+   return pos_to_world(pos_to_hard_skinned_object(decompress_position(position), indices));
 }
 
-float4 transform_skinned_project(float4 position, uint4 indices)
+float4 transform_hard_skinned_project(float4 position, uint4 indices)
 {
-   return pos_project(transform_skinned(position, indices));
+   return pos_project(transform_hard_skinned(position, indices));
+}
+
+float4 transform_skinned(float4 position, float4 weights, uint4 indices)
+{
+   return pos_to_world(pos_to_skinned_object(decompress_position(position), weights, indices));
+}
+
+float4 transform_skinned_project(float4 position, float4 weights, uint4 indices)
+{
+   return pos_project(transform_skinned(position, weights, indices));
 }
 
 Near_scene calculate_near_scene_fade(float4 world_position)

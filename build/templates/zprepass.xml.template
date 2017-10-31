@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "zprepass" skinned = "yes" debuginfo = "no">
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "position" lighting = "none">
+        <vertexshader target = "vs_2_0">
+          #ifdef TRANSFORM_SOFT_SKINNED
+          ~opaque_soft_skinned_vs~
+          #elif defined(TRANSFORM_HARD_SKINNED)
+          ~opaque_hard_skinned_vs~
+          #elif defined(TRANSFORM_UNSKINNED)
+          ~opaque_unskinned_vs~
+          #endif
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~opaque_ps~
+        </pixelshader>
+      </pass>
+    </state>
+    <state id = "1">
+      <pass transform = "position" lighting = "none">
+        <vertexshader target = "vs_2_0">
+          #ifdef TRANSFORM_SOFT_SKINNED
+          ~hardedged_soft_skinned_vs~
+          #elif defined(TRANSFORM_HARD_SKINNED)
+          ~hardedged_hard_skinned_vs~
+          #elif defined(TRANSFORM_UNSKINNED)
+          ~hardedged_unskinned_vs~
+          #endif
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~hardedged_ps~
+        </pixelshader>
+      </pass>
+    </state>
+  </pipeline>
+</shader>
