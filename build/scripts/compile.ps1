@@ -1,5 +1,12 @@
 ﻿.\build\scripts\compile_helpers.ps1
 
+### Filtercopy Shader ###
+
+compile_function "filtercopy" "filtercopy_vs" "vs_2_0"
+compile_function "filtercopy" "filtercopy_1tex_ps" "ps_2_0"
+compile_function "filtercopy" "filtercopy_2tex_ps" "ps_2_0"
+compile_function "filtercopy" "filtercopy_3tex_ps" "ps_2_0"
+compile_function "filtercopy" "filtercopy_4tex_ps" "ps_2_0"
 
 ### Flare Shader ###
 

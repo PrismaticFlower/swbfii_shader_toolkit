@@ -7,12 +7,12 @@ __Tested__ I am fairly certain work correctly.
 * sprite
 * sample
 * prereflection
-
-## Tested Unsure
-* lightbeam
+* filtercopy
 
 ## Tested
 * rain
 * interface
 * skyfog
 * flare
+* lightbeam
+* zprepass

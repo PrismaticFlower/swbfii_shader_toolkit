@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "filtercopy" skinned = "no" debuginfo = "no">
+  <vertexshader name = "filtercopy_vs" target = "vs_2_0">
+    ~filtercopy_vs~
+  </vertexshader>
+
+  <pixelshader name = "filtercopy_1tex_ps" target = "ps_2_0">
+    ~filtercopy_1tex_ps~
+  </pixelshader>
+  
+  <pixelshader name = "filtercopy_2tex_ps" target = "ps_2_0">
+    ~filtercopy_2tex_ps~
+  </pixelshader>
+  
+  <pixelshader name = "filtercopy_3tex_ps" target = "ps_2_0">
+    ~filtercopy_3tex_ps~
+  </pixelshader>
+
+  <pixelshader name = "filtercopy_4tex_ps" target = "ps_2_0">
+    ~filtercopy_4tex_ps~
+  </pixelshader>
+  
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_4tex_ps"/>
+      </pass>
+    </state>
+    
+    <state id = "1">
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_4tex_ps"/>
+      </pass>
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_1tex_ps"/>
+      </pass>
+    </state>
+    
+    <state id = "2">
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_4tex_ps"/>
+      </pass>
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_2tex_ps"/>
+      </pass>
+    </state>
+
+    <state id = "3">
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_4tex_ps"/>
+      </pass>
+      <pass transform = "none" lighting = "none">
+        <vertexshader use = "filtercopy_vs"/>
+        <pixelshader use = "filtercopy_3tex_ps"/>
+      </pass>
+    </state>
+  </pipeline>
+</shader>

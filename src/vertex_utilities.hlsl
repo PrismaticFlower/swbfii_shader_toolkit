@@ -9,6 +9,28 @@ struct Near_scene
    float fade;
 };
 
+float4 get_projection_matrix_row(const uint i)
+{
+   if (i == 0) {
+      return float4(projection_matrix[0].x, projection_matrix[1].x,
+         projection_matrix[2].x, projection_matrix[3].x);
+   }
+   else if (i == 1) {
+      return float4(projection_matrix[0].y, projection_matrix[1].y,
+         projection_matrix[2].y, projection_matrix[3].y);
+   }
+   else if (i == 2) {
+      return float4(projection_matrix[0].z, projection_matrix[1].z,
+         projection_matrix[2].z, projection_matrix[3].z);
+   }
+   else if (i == 3) {
+      return float4(projection_matrix[0].w, projection_matrix[1].w,
+         projection_matrix[2].w, projection_matrix[3].w);
+   }
+
+   return float4(0, 0, 0, 0);
+}
+
 float4 decompress_position(float4 position)
 {
    position = position_decompress_min * position;
@@ -134,8 +156,7 @@ Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;
 
-   float4 projection = float4(projection_matrix[0].w, projection_matrix[1].w,
-                              projection_matrix[2].w, projection_matrix[3].w);
+   float4 projection = get_projection_matrix_row(3);
 
    result.view_z = dot(world_position, projection);
    result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
