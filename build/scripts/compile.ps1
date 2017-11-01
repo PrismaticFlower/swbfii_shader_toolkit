@@ -24,6 +24,11 @@ compile_pass "interface" "bitmap_textured_vs" "bitmap_textured_ps"
 
 compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
 
+### Normalmapadder Shader ###
+
+compile_pass "normalmapadder" "normalmapadder_vs" "normalmapadder_ps"
+compile_pass "normalmapadder" "normalmapadder_binormals_vs" "normalmapadder_binormals_ps"
+
 ### Prereflection Shader ###
 
 compile_function "prereflection" "prereflection_vs" "vs_2_0"

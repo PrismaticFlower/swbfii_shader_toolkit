@@ -9,6 +9,12 @@ struct Near_scene
    float fade;
 };
 
+struct Binormals
+{
+   float3 s;
+   float3 t;
+};
+
 float4 get_projection_matrix_row(const uint i)
 {
    if (i == 0) {
@@ -26,6 +32,24 @@ float4 get_projection_matrix_row(const uint i)
    else if (i == 3) {
       return float4(projection_matrix[0].w, projection_matrix[1].w,
          projection_matrix[2].w, projection_matrix[3].w);
+   }
+
+   return float4(0, 0, 0, 0);
+}
+
+float4 get_world_matrix_row(const uint i)
+{
+   if (i == 0) {
+      return float4(world_matrix[0].x, world_matrix[1].x,
+                    world_matrix[2].x, world_matrix[3].x);
+   }
+   else if (i == 1) {
+      return float4(world_matrix[0].y, world_matrix[1].y,
+                    world_matrix[2].y, world_matrix[3].y);
+   }
+   else if (i == 2) {
+      return float4(world_matrix[0].z, world_matrix[1].z,
+                    world_matrix[2].z, world_matrix[3].z);
    }
 
    return float4(0, 0, 0, 0);
@@ -150,6 +174,21 @@ float4 transform_skinned(float4 position, float4 weights, uint4 indices)
 float4 transform_skinned_project(float4 position, float4 weights, uint4 indices)
 {
    return pos_project(transform_skinned(position, weights, indices));
+}
+
+float3 transform_normals_unskinned(float4 normals)
+{
+   return normals.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+}
+
+Binormals transform_binormals_unskinned(float4 binormal, float4 tangent)
+{
+   Binormals binormals;
+
+   binormals.s = binormal.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+   binormals.t = tangent.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+
+   return binormals;
 }
 
 Near_scene calculate_near_scene_fade(float4 world_position)

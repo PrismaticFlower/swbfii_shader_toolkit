@@ -8,6 +8,7 @@ __Tested__ I am fairly certain work correctly.
 * sample
 * prereflection
 * filtercopy
+* normalmapadder
 
 ## Tested
 * rain
