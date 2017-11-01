@@ -3,6 +3,7 @@
 #include "vertex_utilities.hlsl"
 
 float4 interface_transform_const : register(vs, c[CUSTOM_CONST_MIN]);
+float4 ps_constant : register(ps, c[0]);
 
 sampler bitmap_sampler;
 sampler mask_sampler;
@@ -54,7 +55,7 @@ float4 masked_bitmap_ps(Ps_masked_input input) : COLOR
 {
    float4 color = tex2D(bitmap_sampler, input.texcoord_0);
 
-   return color * constant_0 * tex2D(mask_sampler, input.texcoord_1);
+   return color * ps_constant * tex2D(mask_sampler, input.texcoord_1);
 }
 
 // Vector Element
@@ -83,7 +84,7 @@ Vs_vector_output vector_vs(Vs_vector_input input)
 
 float4 vector_ps(float4 color : COLOR) : COLOR
 {
-   return color * constant_0;
+   return color * ps_constant;
 }
 
 // Bitmap Untextured
@@ -95,7 +96,7 @@ void bitmap_untextured_vs(inout float4 position : POSITION)
 
 float4 bitmap_untextured_ps() : COLOR
 {
-   return constant_0;
+   return ps_constant;
 }
 
 // Bitmap Textured
@@ -125,5 +126,5 @@ Vs_textured_output bitmap_textured_vs(Vs_textured_input input)
 
 float4 bitmap_textured_ps(float2 texcoord : TEXCOORD) : COLOR
 {
-   return tex2D(bitmap_sampler, texcoord) * constant_0;
+   return tex2D(bitmap_sampler, texcoord) * ps_constant;
 }

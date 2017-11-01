@@ -24,9 +24,10 @@ Vs_output sample_vs(float4 position : POSITION)
    return output;
 }
 
-float4 sample_ps(float2 texcoord : TEXCOORD) : COLOR
+float4 sample_ps(float2 texcoord : TEXCOORD,
+                 uniform float4 constant : register(ps, c[0])) : COLOR
 {
    float4 color = tex2D(texture_sampler, texcoord);
 
-   return color.aaaa * constant_0;
+   return color.aaaa * constant;
 }

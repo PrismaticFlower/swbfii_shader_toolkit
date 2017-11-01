@@ -87,15 +87,16 @@ struct Ps_input
 
 // Not going to lie, everything below in the pixel shaders
 // is probably hilariously incorrect. I don't do maths. (or Englishes)
+//
+// (I do however do immature humour in code comments.
 
-float4 normalmapadder_ps(Ps_input input) : COLOR
+float4 normalmapadder_ps(Ps_input input, 
+                         uniform float4 lerp_value : register(ps, c[3])) : COLOR
 {
    float4 tex0_biased = (tex2D(normal_map, input.texcoord_0) - 0.5) * 2.0;
    float4 tex1_biased = (tex2D(base_normal_map, input.texcoord_1.xy) - 0.5) * 2.0;
 
-   const float4 lerp_value = get_projection_matrix_row(1).a;
-
-   float4 color = lerp(lerp_value, tex1_biased, tex0_biased);
+   float4 color = lerp(lerp_value.a, tex1_biased, tex0_biased);
 
    float3 temp = dot(color, color) * 0.5;
    color.rgb = mad(-color.rgb, (temp - 0.5), color.rgb);

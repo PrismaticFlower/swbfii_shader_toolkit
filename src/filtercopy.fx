@@ -46,34 +46,36 @@ struct Ps_input
    float2 texcoord_3 : TEXCOORD3;
 };
 
+float4 ps_constants[4] : register(ps, c[0]);
+
 float4 filtercopy_1tex_ps(Ps_input input) : COLOR
 {
-   return tex2D(textures[0], input.texcoord_0) * constant_0;
+   return tex2D(textures[0], input.texcoord_0) * ps_constants[0];
 }
 
 float4 filtercopy_2tex_ps(Ps_input input) : COLOR
 {
-   float4 color = tex2D(textures[0], input.texcoord_0) * constant_0;
-   color += (tex2D(textures[1], input.texcoord_1) * constant_1);
+   float4 color = tex2D(textures[0], input.texcoord_0) * ps_constants[0];
+   color += (tex2D(textures[1], input.texcoord_1) * ps_constants[1]);
 
    return color;
 }
 
 float4 filtercopy_3tex_ps(Ps_input input) : COLOR
 {
-   float4 color = tex2D(textures[0], input.texcoord_0) * constant_0;
-   color += (tex2D(textures[1], input.texcoord_1) * constant_1);
-   color += (tex2D(textures[2], input.texcoord_2) * get_projection_matrix_row(0));
+   float4 color = tex2D(textures[0], input.texcoord_0) * ps_constants[0];
+   color += (tex2D(textures[1], input.texcoord_1) * ps_constants[1]);
+   color += (tex2D(textures[2], input.texcoord_2) * ps_constants[2]);
 
    return color;
 }
 
 float4 filtercopy_4tex_ps(Ps_input input) : COLOR
 {
-   float4 color = tex2D(textures[0], input.texcoord_0) * constant_0;
-   color += (tex2D(textures[1], input.texcoord_1) * constant_1);
-   color += (tex2D(textures[2], input.texcoord_2) * get_projection_matrix_row(0));
-   color += (tex2D(textures[3], input.texcoord_3) * get_projection_matrix_row(1));
+   float4 color = tex2D(textures[0], input.texcoord_0) * ps_constants[0];
+   color += (tex2D(textures[1], input.texcoord_1) * ps_constants[1]);
+   color += (tex2D(textures[2], input.texcoord_2) * ps_constants[2]);
+   color += (tex2D(textures[3], input.texcoord_3) * ps_constants[3]);
 
    return color;
 }
