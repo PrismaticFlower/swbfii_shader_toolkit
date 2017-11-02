@@ -209,6 +209,18 @@ Binormals transform_binormals_unskinned(float4 binormal, float4 tangent)
    return binormals;
 }
 
+float4 transform_shadowmap_coords(float4 world_position)
+{
+   float4 coords;
+
+   coords.x = dot(world_position, shadow_map_transform[0]);
+   coords.y = dot(world_position, shadow_map_transform[1]);
+   coords.z = dot(world_position, shadow_map_transform[2]);
+   coords.w = constant_0.x;
+
+   return coords;
+}
+
 Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;

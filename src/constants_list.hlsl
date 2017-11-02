@@ -29,7 +29,7 @@ float4 near_scene_fade : register(vs, c[8]);
 #define hdr_info near_scene_fade
 
 // shadow map transform
-float4x3 shadow_map_transform : register(vs, c[9]);
+float4 shadow_map_transform[3] : register(vs, c[9]);
 
 // (normal decompress = 2 or 1, -1 or 0, texture decompress = 1 / 0x0800 or 1, 1)
 float4 normaltex_decompress : register(vs, c[12]);

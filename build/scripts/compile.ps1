@@ -13,6 +13,15 @@ compile_function "filtercopy" "filtercopy_4tex_ps" "ps_2_0"
 compile_pass "flare" "flare_textured_vs" "flare_textured_ps"
 compile_pass "flare" "flare_untextured_vs" "flare_untextured_ps"
 
+### Foliage Shader ###
+
+compile_function "foliage" "opaque_vs" "vs_2_0"
+compile_function "foliage" "transparent_vs" "vs_2_0"
+compile_function "foliage" "hardedged_ps" "ps_2_0"
+compile_function "foliage" "transparent_hardedged_ps" "ps_2_0"
+compile_function "foliage" "shadow_hardedged_ps" "ps_2_0"
+compile_function "foliage" "shadow_transparent_hardedged_ps" "ps_2_0"
+
 ### Interface Shader ###
 
 compile_pass "interface" "masked_bitmap_vs" "masked_bitmap_ps"
@@ -79,5 +88,5 @@ foreach ($file in Get-ChildItem -File -Path build\templates\* -Include *.xml.tem
 {
    $name = $file.Name -replace ".xml.template", ""
 
-   process_template $name
+   instantiate_template $name
 }

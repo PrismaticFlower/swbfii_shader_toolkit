@@ -19,3 +19,4 @@ __Tested__ I am fairly certain work correctly.
 * zprepass
 * shield
 * particle
+* foliage
