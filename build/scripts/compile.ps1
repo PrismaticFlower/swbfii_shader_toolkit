@@ -29,6 +29,11 @@ compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
 compile_pass "normalmapadder" "normalmapadder_vs" "normalmapadder_ps"
 compile_pass "normalmapadder" "normalmapadder_binormals_vs" "normalmapadder_binormals_ps"
 
+### Particle Shader ###
+
+compile_pass "particle" "normal_vs" "normal_ps"
+compile_pass "particle" "blur_vs" "blur_ps"
+
 ### Prereflection Shader ###
 
 compile_function "prereflection" "prereflection_vs" "vs_2_0"

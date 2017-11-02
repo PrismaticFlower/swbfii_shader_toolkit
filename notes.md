@@ -18,3 +18,4 @@ __Tested__ I am fairly certain work correctly.
 * lightbeam
 * zprepass
 * shield
+* particle
