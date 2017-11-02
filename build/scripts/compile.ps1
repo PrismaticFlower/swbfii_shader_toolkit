@@ -47,6 +47,10 @@ compile_pass "sample" "sample_vs" "sample_ps"
 
 compile_pass "shadowquad" "shadowquad_vs" "shadowquad_ps"
 
+### Shield Shader ###
+
+compile_pass "shield" "shield_vs" "shield_ps"
+
 ### Skyfog Shader ###
 
 compile_pass "skyfog" "skyfog_vs" "skyfog_ps"

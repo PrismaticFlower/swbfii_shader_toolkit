@@ -79,6 +79,24 @@ float2 decompress_transform_texcoords(float4 texcoords, float4 x_transform,
    return transformed;
 }
 
+float3 decompress_normals(float3 normals)
+{
+   return normals.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+}
+
+float3 decompress_transform_normals(float3 normals)
+{
+   normals = decompress_normals(normals);
+
+   float3 world_normals;
+
+   world_normals.x = dot(normals, get_world_matrix_row(0).xyz);
+   world_normals.y = dot(normals, get_world_matrix_row(1).xyz);
+   world_normals.z = dot(normals, get_world_matrix_row(2).xyz);
+
+   return world_normals;
+}
+
 float4 get_material_color(float4 color)
 {
    return (color * color_state.yyyw + color_state.xxxz) * material_diffuse_color;
@@ -207,7 +225,6 @@ Near_scene clamp_near_scene_fade(Near_scene near_scene)
 {
    near_scene.fade = max(near_scene.fade, constant_0.x);
    near_scene.fade = min(near_scene.fade, constant_0.z);
-   near_scene.fade = near_scene.fade * near_scene.fade;
 
    return near_scene;
 }

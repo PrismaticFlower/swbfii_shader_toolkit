@@ -17,3 +17,4 @@ __Tested__ I am fairly certain work correctly.
 * flare
 * lightbeam
 * zprepass
+* shield

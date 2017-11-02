@@ -21,6 +21,7 @@ Vs_output lightbeam_vs(Vs_input input)
    float4 world_position = transform_unskinned(input.position);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
+   near_scene.fade = near_scene.fade * near_scene.fade;
 
    output.position = pos_project(world_position);
    output.fog = calculate_fog(near_scene, world_position);

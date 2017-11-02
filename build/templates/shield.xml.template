@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "shield" skinned = "no" debuginfo = "no">
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "normals" lighting = "none" vertexcolor = "no">
+        <vertexshader target = "vs_2_0">
+          ~shield_vs~
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~shield_ps~
+        </pixelshader>
+      </pass>
+    </state>
+  </pipeline>
+</shader>
