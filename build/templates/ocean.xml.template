@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader rendertype = "ocean" skinned = "no" debuginfo = "no">
+  <pipeline id = "2">
+    <state id = "0">
+      <pass transform = "normals" lighting = "none">
+        <vertexshader target = "vs_2_0">
+          ~far_vs~
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~far_ps~
+        </pixelshader>
+      </pass>
+    </state>
+    <state id = "1">
+      <pass transform = "normals" lighting = "none">
+        <vertexshader target = "vs_2_0">
+          ~near_vs~
+        </vertexshader>
+        <pixelshader target = "ps_2_0">
+          ~near_ps~
+        </pixelshader>
+      </pass>
+    </state>
+  </pipeline>
+</shader>

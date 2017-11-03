@@ -225,9 +225,7 @@ Near_scene calculate_near_scene_fade(float4 world_position)
 {
    Near_scene result;
 
-   float4 projection = get_projection_matrix_row(3);
-
-   result.view_z = dot(world_position, projection);
+   result.view_z = dot(world_position, get_projection_matrix_row(3));
    result.fade = result.view_z * near_scene_fade.x + near_scene_fade.y;
 
    return result;
@@ -244,6 +242,16 @@ Near_scene clamp_near_scene_fade(Near_scene near_scene)
 float calculate_fog(Near_scene near_scene, float4 world_position)
 {
    float x = near_scene.view_z * fog_info.x + fog_info.y;
+   float y = world_position.y * fog_info.z + fog_info.w;
+
+   return min(x, y);
+}
+
+float calculate_fog(float4 world_position)
+{
+   float view_z = dot(world_position, get_projection_matrix_row(3));
+
+   float x = view_z * fog_info.x + fog_info.y;
    float y = world_position.y * fog_info.z + fog_info.w;
 
    return min(x, y);

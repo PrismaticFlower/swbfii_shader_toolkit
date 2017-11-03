@@ -38,6 +38,11 @@ compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
 compile_pass "normalmapadder" "normalmapadder_vs" "normalmapadder_ps"
 compile_pass "normalmapadder" "normalmapadder_binormals_vs" "normalmapadder_binormals_ps"
 
+### Ocean Shader ###
+
+compile_pass "ocean" "far_vs" "far_ps"
+compile_pass "ocean" "near_vs" "near_ps"
+
 ### Particle Shader ###
 
 compile_pass "particle" "normal_vs" "normal_ps"

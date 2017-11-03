@@ -20,3 +20,4 @@ __Tested__ I am fairly certain work correctly.
 * shield
 * particle
 * foliage
+* ocean
