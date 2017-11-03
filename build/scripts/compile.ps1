@@ -29,6 +29,15 @@ compile_function "foliage" "transparent_hardedged_ps" "ps_2_0"
 compile_function "foliage" "shadow_hardedged_ps" "ps_2_0"
 compile_function "foliage" "shadow_transparent_hardedged_ps" "ps_2_0"
 
+### HDR Shader ###
+
+compile_function "hdr" "screenspace_vs" "vs_2_0"
+compile_function "hdr" "bloomfilter_vs" "vs_2_0"
+compile_function "hdr" "glowthreshold_ps" "ps_2_0"
+compile_function "hdr" "luminance_ps" "ps_2_0"
+compile_function "hdr" "bloomfilter_ps" "ps_2_0"
+compile_function "hdr" "screenspace_ps" "ps_2_0"
+
 ### Interface Shader ###
 
 compile_pass "interface" "masked_bitmap_vs" "masked_bitmap_ps"
