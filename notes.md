@@ -9,6 +9,7 @@ __Tested__ I am fairly certain work correctly.
 * prereflection
 * filtercopy
 * normalmapadder
+* decal
 
 ## Tested
 * rain

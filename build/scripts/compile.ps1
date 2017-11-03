@@ -1,5 +1,12 @@
 ﻿.\build\scripts\compile_helpers.ps1
 
+### Decal Shader ###
+
+compile_function "decal" "decal_vs" "vs_2_0"
+compile_function "decal" "diffuse_ps" "ps_2_0"
+compile_function "decal" "diffuse_bump_ps" "ps_2_0"
+compile_function "decal" "bump_ps" "ps_2_0"
+
 ### Filtercopy Shader ###
 
 compile_function "filtercopy" "filtercopy_vs" "vs_2_0"
