@@ -41,6 +41,7 @@ ucft
       "interface"
       "lightbeam"
       "normal"
+      "normal_terrain"
       "normalmapadder"
       "ocean"
       "particle"
@@ -58,7 +59,6 @@ ucft
       "specularlighting"
       "sprite"
       "stencilshadow"
-      "Terrain2"
       "water"
       "zprepass"
    }

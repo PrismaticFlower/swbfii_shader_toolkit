@@ -49,6 +49,13 @@ compile_pass "interface" "bitmap_textured_vs" "bitmap_textured_ps"
 
 compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
 
+### Normal terrain Shader ###
+
+compile_function "normal_terrain" "diffuse_blendmap_vs" "vs_2_0" $false $true
+compile_function "normal_terrain" "detailing_vs" "vs_2_0" $false $true
+compile_function "normal_terrain" "diffuse_blendmap_ps" "ps_2_0"
+compile_function "normal_terrain" "detailing_ps" "ps_2_0"
+
 ### Normalmapadder Shader ###
 
 compile_pass "normalmapadder" "normalmapadder_vs" "normalmapadder_ps"

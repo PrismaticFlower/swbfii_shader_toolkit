@@ -49,12 +49,12 @@ float4x3 world_matrix : register(vs, c[16]);
 // Pandemic: ambient color interpolated with ambient color1 using world 
 // normal y component - applied in the transform fragment (i.e. lighting 
 // fragment not needed)
-float4 light_ambient_color_0 : register(vs, c[19]);
+float4 light_ambient_color_top : register(vs, c[19]);
 
 // Pandemic: ambient color interpolated with ambient color0 using world 
 // normal y component - applied in the transform fragment (i.e. lighting 
 // fragment not needed)
-float4 light_ambient_color_1 : register(vs, c[20]);
+float4 light_ambient_color_bottom : register(vs, c[20]);
 
 // directional light 0 color
 float4 light_directional_0_color : register(vs, c[21]);
@@ -72,13 +72,13 @@ float4 light_directional_1_dir : register(vs, c[24]);
 float4 light_point_0_color : register(vs, c[25]);
 
 // point light 0 world space position
-float4 light_point_0_dir : register(vs, c[26]);
+float4 light_point_0_pos : register(vs, c[26]);
 
 // point light 1 color, intensity in alpha value
 float4 light_point_1_color : register(vs, c[27]);
 
 // point light 1 world space position
-float4 light_point_1_dir : register(vs, c[28]);
+float4 light_point_1_pos : register(vs, c[28]);
 
 // point light 2 color, intensity in alpha value 
 // (shares register with light_spot_color)
@@ -86,7 +86,7 @@ float4 light_point_2_color : register(vs, c[29]);
 
 // point light 2 world space position
 // (shares register with light_spot_pos)
-float4 light_point_2_dir : register(vs, c[30]);
+float4 light_point_2_pos : register(vs, c[30]);
 
 // point light 3 color, intensity in alpha value
 // (shares register with light_spot_dir)
@@ -94,7 +94,7 @@ float4 light_point_3_color : register(vs, c[31]);
 
 // point light 3 world space position
 // (shares register with light_spot_params)
-float4 light_point_3_dir : register(vs, c[32]);
+float4 light_point_3_pos : register(vs, c[32]);
 
 // spot light color, intensity in alpha value
 float4 light_spot_color : register(vs, c[29]);
