@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader rendertype = "Terrain2" skinned = "no" debuginfo = "no">
+<shader rendertype = "Terrain2" skinned = "no" debuginfo = "no" vertexcolor = "always" texcoord = "never">
   <vertexshader name = "diffuse_blendmap_vs" target = "vs_2_0">
     @diffuse_blendmap_vs@
   </vertexshader>
@@ -15,7 +15,7 @@
       </pass>
     </state>
     <state id = "1">
-      <pass transform = "normals" lighting = "none">
+      <pass transform = "normals" lighting = "none" vertexcolor = "yes">
         <vertexshader use = "diffuse_blendmap_vs"/>
         <pixelshader use = "diffuse_blendmap_ps"/>
       </pass>

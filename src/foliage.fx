@@ -1,5 +1,6 @@
 
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 struct Vs_input
 {
@@ -26,9 +27,9 @@ Vs_output opaque_vs(Vs_input input)
 {
    Vs_output output;
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
    output.diffuse_coords = decompress_texcoords(input.texcoord);
    output.shadowmap_coords = transform_shadowmap_coords(world_position);
 
@@ -47,9 +48,9 @@ Vs_output transparent_vs(Vs_input input)
 {
    Vs_output output;
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
    output.diffuse_coords = decompress_texcoords(input.texcoord);
    output.shadowmap_coords = transform_shadowmap_coords(world_position);
 

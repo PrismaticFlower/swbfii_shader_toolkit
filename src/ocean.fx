@@ -1,10 +1,11 @@
 
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 struct Vs_input
 {
    float4 position : POSITION;
-   float4 normals : NORMAL;
+   float3 normals : NORMAL;
    float4 texcoords : TEXCOORD0;
    float4 color : COLOR;
 };
@@ -47,13 +48,13 @@ Vs_output near_vs(Vs_input input)
    output.base_texcoords = texcoords;
    output.foam_texcoords = texcoords;
 
-   float3 normals = transform_normals_unskinned(input.normals);
+   float3 normals = decompress_normals(input.normals);
 
    output.normal_texcoords = calculate_world_normal(normals);
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
 

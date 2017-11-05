@@ -1,5 +1,6 @@
 
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 float4 texcoord_transforms[4] : register(vs, c[CUSTOM_CONST_MIN]);
 
@@ -10,8 +11,8 @@ struct Vs_input
 {
    float4 position : POSITION;
    float4 texcoord : TEXCOORD;
-   float4 binormal : BINORMAL;
-   float4 tangent : TANGENT;
+   float3 binormal : BINORMAL;
+   float3 tangent : TANGENT;
    float4 color : COLOR;
 };
 
@@ -35,7 +36,7 @@ Vs_output normalmapadder_vs(Vs_input input)
 {
    Vs_output output;
     
-   output.position = transform_unskinned_project(input.position);
+   output.position = transform::position_project(input.position);
    output.texcoord_0 = decompress_transform_texcoords(input.texcoord,
                                                       texcoord_transforms[0], 
                                                       texcoord_transforms[1]);
@@ -50,9 +51,9 @@ Vs_output_binormals normalmapadder_binormals_vs(Vs_input input)
 {
    Vs_output_binormals output;
 
-   output.position = transform_unskinned_project(input.position);
+   output.position = transform::position_project(input.position);
 
-   Binormals binormals = transform_binormals_unskinned(input.binormal, input.tangent);
+   Binormals binormals = decompress_binormals(input.binormal, input.tangent);
 
    float3 binormal_s;
    binormal_s.x = dot(get_world_matrix_row(0).xyz, binormals.s);

@@ -25,7 +25,8 @@ Vs_normal_output normal_vs(Vs_normal_input input)
 {
    Vs_normal_output output;
 
-   float4 position = transform_unskinned_project(input.position);
+   float4 world_position = position_to_world(input.position);
+   float4 position = position_project(world_position);
 
    output.position = position;
 
@@ -34,8 +35,6 @@ Vs_normal_output normal_vs(Vs_normal_input input)
    fade_factor = position.w * particle_constants[0].x + particle_constants[0].y;
    fade_factor = max(fade_factor, constant_0.x);
    fade_factor = max(fade_factor, constant_0.z);
-
-   float4 world_position = pos_to_world(input.position);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
    output.fog = calculate_fog(near_scene, world_position);
@@ -76,7 +75,8 @@ Vs_blur_output blur_vs(Vs_blur_input input)
 {
    Vs_blur_output output;
 
-   float4 position = transform_unskinned_project(input.position);
+   float4 world_position = position_to_world(input.position);
+   float4 position = position_project(world_position);
 
    output.position = position;
 
@@ -85,8 +85,6 @@ Vs_blur_output blur_vs(Vs_blur_input input)
    fade_factor = position.w * particle_constants[0].x + particle_constants[0].y;
    fade_factor = max(fade_factor, constant_0.x);
    fade_factor = max(fade_factor, constant_0.z);
-
-   float4 world_position = pos_to_world(input.position);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
    output.fog = calculate_fog(near_scene, world_position);

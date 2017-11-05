@@ -109,7 +109,7 @@ Lighting calculate(float3 world_normal, float4 world_position,
 
    lighting.diffuse.rgb = ambient(world_normal) + static_diffuse_lighting.rgb;
 
-   float4 intensity = float4(0.0, 0.0, 0.0, 0.0);
+   float4 intensity = constant_0.xxxz;
 
    intensity.x = intensity_directional(world_normal, light_directional_0_dir);
    lighting.diffuse += intensity.x * light_directional_0_color;
@@ -133,9 +133,7 @@ Lighting calculate(float3 world_normal, float4 world_position,
 
    intensity.w = intensity_point(world_normal, world_position, light_point_3_pos);
    lighting.diffuse += intensity.w * light_point_3_color;
-#endif
-
-#ifdef LIGHTING_SPOT_0
+#elif defined(LIGHTING_SPOT_0)
    intensity.z = intensity_spot(world_normal, world_position);
    lighting.diffuse += intensity.z * light_point_2_color;
 #endif

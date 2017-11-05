@@ -97,6 +97,16 @@ float3 decompress_transform_normals(float3 normals)
    return world_normals;
 }
 
+Binormals decompress_binormals(float3 binormal, float3 tangent)
+{
+   Binormals binormals;
+
+   binormals.s = binormal.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+   binormals.t = tangent.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
+
+   return binormals;
+}
+
 float4 get_material_color(float4 color)
 {
    return (color * color_state.yyyw + color_state.xxxz) * material_diffuse_color;
@@ -107,106 +117,19 @@ float4 get_static_diffuse_color(float4 color)
    return color * color_state.xxxz + color_state.zzzz;
 }
 
-float4 pos_to_hard_skinned_object(float4 position, uint4 indices)
-{
-   int index = (indices.xyz * constant_1.www).x;
-
-   float4 result;
-
-   result.x = dot(position, bone_matrices[0 + index]);
-   result.y = dot(position, bone_matrices[1 + index]);
-   result.z = dot(position, bone_matrices[2 + index]);
-   result.w = constant_0.z;
-
-   return result;
-}
-
-float4 pos_to_skinned_object(float4 position, float4 weights, uint4 vertex_indices)
-{
-   int3 indices = vertex_indices.xyz * constant_1.www;
-
-   float4 skin_0 = weights.x * bone_matrices[0 + indices.x];
-   float4 skin_1 = weights.x * bone_matrices[1 + indices.x];
-   float4 skin_2 = weights.x * bone_matrices[2 + indices.x];
-
-   skin_0 += (weights.y *  bone_matrices[0 + indices.y]);
-   skin_1 += (weights.y *  bone_matrices[1 + indices.y]);
-   skin_2 += (weights.y *  bone_matrices[2 + indices.y]);
-
-   float z_weight = dot(weights, constant_0.wwxz);
-
-   skin_0 += (z_weight *  bone_matrices[0 + indices.y]);
-   skin_1 += (z_weight *  bone_matrices[1 + indices.y]);
-   skin_2 += (z_weight *  bone_matrices[2 + indices.y]);
-
-   float4 result;
-
-   result.x = dot(position, skin_0);
-   result.y = dot(position, skin_1);
-   result.z = dot(position, skin_2);
-   result.w = constant_0.z;
-
-   return result;
-}
-
-float4 pos_to_world(float4 position)
+float4 position_to_world(float4 position)
 {
    return float4(mul(position, world_matrix), constant_0.z);
 }
 
-float4 pos_project(float4 position)
+float4 position_project(float4 position)
 {
    return mul(position, projection_matrix);
 }
 
-float4 pos_to_world_project(float4 position)
+float4 position_to_world_project(float4 position)
 {
-   return pos_project(pos_to_world(position));
-}
-
-float4 transform_unskinned(float4 position)
-{
-   return pos_to_world(decompress_position(position));
-}
-
-float4 transform_unskinned_project(float4 position)
-{
-   return pos_project(transform_unskinned(position));
-}
-
-float4 transform_hard_skinned(float4 position, uint4 indices)
-{
-   return pos_to_world(pos_to_hard_skinned_object(decompress_position(position), indices));
-}
-
-float4 transform_hard_skinned_project(float4 position, uint4 indices)
-{
-   return pos_project(transform_hard_skinned(position, indices));
-}
-
-float4 transform_skinned(float4 position, float4 weights, uint4 indices)
-{
-   return pos_to_world(pos_to_skinned_object(decompress_position(position), weights, indices));
-}
-
-float4 transform_skinned_project(float4 position, float4 weights, uint4 indices)
-{
-   return pos_project(transform_skinned(position, weights, indices));
-}
-
-float3 transform_normals_unskinned(float4 normals)
-{
-   return normals.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
-}
-
-Binormals transform_binormals_unskinned(float4 binormal, float4 tangent)
-{
-   Binormals binormals;
-
-   binormals.s = binormal.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
-   binormals.t = tangent.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
-
-   return binormals;
+   return position_project(position_to_world(position));
 }
 
 float4 transform_shadowmap_coords(float4 world_position)
@@ -215,8 +138,8 @@ float4 transform_shadowmap_coords(float4 world_position)
 
    coords.x = dot(world_position, shadow_map_transform[0]);
    coords.y = dot(world_position, shadow_map_transform[1]);
-   coords.z = dot(world_position, shadow_map_transform[2]);
-   coords.w = constant_0.x;
+   coords.w = dot(world_position, shadow_map_transform[2]);
+   coords.z = constant_0.x;
 
    return coords;
 }

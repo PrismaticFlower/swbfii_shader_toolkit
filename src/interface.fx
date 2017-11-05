@@ -10,7 +10,7 @@ sampler mask_sampler;
 
 float4 project_interface_pos(float4 position)
 {
-   position = pos_to_world_project(position);
+   position = position_to_world_project(position);
 
    position.xy = position.xy * interface_transform_const.xy + interface_transform_const.zw;
 

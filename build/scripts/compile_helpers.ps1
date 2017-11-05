@@ -2,7 +2,7 @@
 {
     $last_write = (Get-Item $file_path).LastWriteTime
 
-    (Test-Path -Path $test_aginst -OlderThan $last_write) -or ((Get-Item $test_aginst).Length -eq 0)
+    (Test-Path -Path $test_aginst -OlderThan $last_write) -or (-not (Test-Path -Path $test_aginst)) -or ((Get-Item $test_aginst).Length -eq 0)
 }
 
 function global:compile_function($shader, $func_name, $profile, 
@@ -13,7 +13,11 @@ function global:compile_function($shader, $func_name, $profile,
 
     if ($skinned -eq $true)
     {
-        $transform_pass_defines = '/D TRANSFORM_UNSKINNED=1', '/D TRANSFORM_SOFT_SKINNED=1', '/D TRANSFORM_HARD_SKINNED=1'
+        $tu = 'TRANSFORM_UNSKINNED'
+        $tss = 'TRANSFORM_SOFT_SKINNED'
+        $ths = 'TRANSFORM_HARD_SKINNED'
+
+        $transform_pass_defines = "/D$tu", "/D$tss", "/D$ths"
         $transform_pass_names = '_unskinned', '_soft_skinned', '_hard_skinned'
     }
     
@@ -22,15 +26,23 @@ function global:compile_function($shader, $func_name, $profile,
 
     if ($lighting -eq $true)
     {
-        $ld = "/D LIGHTING_DIRECTIONAL=1"
-        $lp_0 = "/D LIGHTING_POINT_0=1"
-        $ld_1 = "/D LIGHTING_POINT_1=1"
-        $ld_23 = "/D LIGHTING_POINT_23=1"
-        $ls = "/D LIGHTING_SPOT_0=1"
+        $ld = 'LIGHTING_DIRECTIONAL'
+        $lp_0 = 'LIGHTING_POINT_0'
+        $lp_1 = 'LIGHTING_POINT_1'
+        $lp_23 = 'LIGHTING_POINT_23'
+        $ls = 'LIGHTING_SPOT_0'
+        $ln = 'LIGHTING_NONE'
 
-        $lighting_pass_defines = "${ld}", "${ld} ${lp_0}", "${ld} ${lp_0} ${lp_1}", "${ld} ${lp_0} ${lp_1} ${ld_23}", 
-                                 "${ld} ${ls}", "${ld} ${lp_0} ${ls}", "${ld} ${lp_0} ${lp_1} ${ls}", ""
-        $lighting_pass_names = "_2d", "_2d1p", "_2d2p", "_2d4p", "_2d1s", "_2d1p1s", "_2d2p1s", "_unlit"
+        $lighting_pass_defines = @("/D${ld}"),
+        @("/D${ld}", "/D${lp_0}"),
+        @("/D${ld}", "/D${lp_0}", "/D${lp_1}"),
+        @("/D${ld}", "/D${lp_0}", "/D${lp_1}", "/D${lp_23}"), 
+        @("/D${ld}", "/D${ls}"),
+        @("/D${ld}", "/D${ls}", "/D${lp_0}"),
+        @("/D${ld}", "/D${ls}", "/D${lp_0}", "/D${lp_1}"),
+        @("/D${ln}")
+                                 
+        $lighting_pass_names = "_2d", "_2d1p", "_2d2p", "_2d4p", "_2d1s", "_2d1p1s", "_2d2p1s", ""
     }
 
     for ($i = 0; $i -lt $transform_pass_names.length; ++$i)
@@ -40,17 +52,22 @@ function global:compile_function($shader, $func_name, $profile,
 
         for ($j = 0; $j -lt $lighting_pass_defines.length; ++$j)
         {
-            $lighting_define = $lighting_pass_defines[$j]
+            $lighting_defines = $lighting_pass_defines[$j]
             $lighting_name = $lighting_pass_names[$j]
 
             $asm_path = "build\asm\${shader}_${func_name}${transform_name}${lighting_name}.asm"
 
             # skip compiling the function if it's been recently compiled.
-            if (file_older_than "src/$shader.fx" $asm_path) { continue };
+            if (-not (function_needs_compiling "src/$shader.fx" $asm_path)) { continue };
+            
+            Write-Host "Compiling $asm_path"
 
-            Write-Host "Compiling ${asm_path}"
+            $function = fxc /nologo $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx
 
-            $function = fxc /nologo $lighting_define $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx
+            if ($LASTEXITCODE -ne 0) 
+            {
+                throw "compilation failure!", "fxc /nologo $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx"
+            }
 
             # Clean string so it is safe to pass through the munger.
             $function = $function -replace $profile, ""
@@ -101,7 +118,7 @@ function global:instantiate_lighting($name)
 #elif defined(LIGHTING_2D1S)
     ~${name}_2d2p1s~
 #else
-    ~${name}_unlit~
+    ~${name}~
 #endif
 "@
 }

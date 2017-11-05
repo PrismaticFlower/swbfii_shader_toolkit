@@ -1,5 +1,6 @@
 
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 struct Vs_input
 {
@@ -22,11 +23,11 @@ float4 decal_constants[2] : register(ps, c[0]);
 
 Vs_output decal_vs(Vs_input input)
 {
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
    Vs_output output;
 
-   output.position = pos_project(input.position);
+   output.position = position_project(input.position);
    output.texcoords = decompress_texcoords(input.texcoords);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);

@@ -27,9 +27,9 @@ Vs_output sprite_vs(Vs_input input)
 {
    Vs_output output;
 
-   float4 world_position = pos_to_world(input.position);
+   float4 world_position = position_to_world(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
    output.texcoord = decompress_texcoords(input.texcoord);
 
    float4 material_color = get_material_color(input.color);

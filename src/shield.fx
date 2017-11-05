@@ -1,5 +1,6 @@
 
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 struct Vs_input
 {
@@ -30,7 +31,7 @@ Vs_output shield_vs(Vs_input input)
    Vs_output output;
 
    float3 world_normal = decompress_transform_normals(input.normals);
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
    float4 eye_to_vertex[2];
    eye_to_vertex[1].w = 1.0;
@@ -67,7 +68,7 @@ Vs_output shield_vs(Vs_input input)
 
    float3 specular_color = eye_dot_normal * shield_constants[0].xyz;
 
-   output.position = transform_unskinned_project(input.position);
+   output.position = transform::position_project(input.position);
 
    float2 texcoords = decompress_texcoords(input.texcoords);
 

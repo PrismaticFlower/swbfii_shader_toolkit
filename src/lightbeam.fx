@@ -1,5 +1,6 @@
 #include "constants_list.hlsl"
 #include "vertex_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 struct Vs_input
 {
@@ -18,12 +19,12 @@ Vs_output lightbeam_vs(Vs_input input)
 {
    Vs_output output;
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
    near_scene.fade = near_scene.fade * near_scene.fade;
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
    output.fog = calculate_fog(near_scene, world_position);
 
    near_scene = clamp_near_scene_fade(near_scene);

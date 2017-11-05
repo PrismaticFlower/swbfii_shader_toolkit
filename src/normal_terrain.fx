@@ -1,6 +1,7 @@
 
 #include "vertex_utilities.hlsl"
 #include "lighting_utilities.hlsl"
+#include "transform_utilities.hlsl"
 
 float4 terrain_constant : register(vs, c[CUSTOM_CONST_MIN]);
 float4 texture_coords[8] : register(vs, c[CUSTOM_CONST_MIN + 1]);
@@ -28,9 +29,9 @@ Vs_blendmap_output diffuse_blendmap_vs(Vs_input input)
 {
    Vs_blendmap_output output;
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
 
    output.texcoord_0.x = dot(world_position, texture_coords[0]);
    output.texcoord_0.y = dot(world_position, texture_coords[1]);
@@ -73,7 +74,7 @@ struct Vs_detail_output
    float4 projection_texcoords : TEXCOORD2;
    float4 shadow_map_texcoords : TEXCOORD3;
    float4 color_0 : COLOR0;
-   float4 color_1 : COLOR1;
+   float3 color_1 : COLOR1;
    float1 fog : FOG;
 };
 
@@ -81,9 +82,9 @@ Vs_detail_output detailing_vs(Vs_input input)
 {
    Vs_detail_output output;
 
-   float4 world_position = transform_unskinned(input.position);
+   float4 world_position = transform::position(input.position);
 
-   output.position = pos_project(world_position);
+   output.position = position_project(world_position);
 
    output.detail_texcoord_0.x = dot(world_position, texture_coords[0]);
    output.detail_texcoord_0.y = dot(world_position, texture_coords[1]);
@@ -93,16 +94,7 @@ Vs_detail_output detailing_vs(Vs_input input)
 
    output.projection_texcoords = mul(world_position, light_proj_matrix);
 
-   output.shadow_map_texcoords.x = dot(world_position, shadow_map_transform[0]);
-   output.shadow_map_texcoords.y = dot(world_position, shadow_map_transform[1]);
-   output.shadow_map_texcoords.w = dot(world_position, shadow_map_transform[2]);
-   output.shadow_map_texcoords.z = constant_0.x;
-
-   Near_scene near_scene = calculate_near_scene_fade(world_position);
-
-   output.fog = calculate_fog(near_scene, world_position);
-   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
-   output.color_1 = float4(0.0, 0.0, 0.0, 0.0);
+   output.shadow_map_texcoords = transform_shadowmap_coords(world_position); 
 
    float3 world_normal = decompress_transform_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
@@ -113,9 +105,17 @@ Vs_detail_output detailing_vs(Vs_input input)
 
    float4 material_color = get_material_color(input.color);
 
-   output.color_1.rgb = material_color.rgb * lighting.static_diffuse.a;
-   output.color_1.rgb *= light_proj_selector.rgb;
+   output.color_1 = material_color.rgb * lighting.static_diffuse.a;
+   output.color_1 *= light_proj_selector.rgb;
+
+   output.color_0.rgb = lighting.diffuse.rgb * terrain_constant.xxx + terrain_constant.yyy;
+   output.color_0.w = lighting.diffuse.w;
    output.color_0.rgb = lighting.diffuse.rgb;
+
+   Near_scene near_scene = calculate_near_scene_fade(world_position);
+
+   output.fog = calculate_fog(near_scene, world_position);
+   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
 
    return output;
 }
@@ -138,20 +138,20 @@ float4 diffuse_blendmap_ps(Ps_blendmap_input input, uniform sampler diffuse_maps
    float4 diffuse_color_2 = tex2D(diffuse_maps[2], input.texcoord_2);
    float4 blendmap_color = tex2D(blend_or_detail_map, input.texcoord_3);
 
-   float blend_factor = dot(input.color_mask.rgb, float3(0, 1, 0));
-   blend_factor = clamp(blend_factor, 0.0, 1.0);
+   float blend_factor_t2 = dot(input.color_mask.rgb, float3(0, 1, 0));
+   blend_factor_t2 = clamp(blend_factor_t2, 0.0, 1.0);
 
    float4 color;
 
-   color.rgb = diffuse_color_2.rgb * blend_factor;
+   color.rgb = diffuse_color_2.rgb * blend_factor_t2;
 
-   blend_factor = input.color_mask.b;
+   float blend_factor_t1 = input.color_mask.b;
 
-   color.rgb += diffuse_color_1.rgb * blend_factor;
+   color.rgb += diffuse_color_1.rgb * blend_factor_t1;
 
-   blend_factor = (1 - input.color_mask.b) + -input.color_mask.b;
+   float blend_factor_t0 = (1 - blend_factor_t2) + -blend_factor_t1;
 
-   color.rgb += diffuse_color_0.rgb * blend_factor;
+   color.rgb += diffuse_color_0.rgb * blend_factor_t0;
 
    color.rgb *= input.light_color.rgb;
 
