@@ -30,7 +30,7 @@ Vs_output shield_vs(Vs_input input)
 {
    Vs_output output;
 
-   float3 world_normal = decompress_transform_normals(input.normals);
+   float3 world_normal = normals_to_world(decompress_normals(input.normals));
    float4 world_position = transform::position(input.position);
 
    float4 eye_to_vertex[2];
