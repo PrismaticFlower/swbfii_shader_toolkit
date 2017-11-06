@@ -2,6 +2,7 @@
 #define LIGHTING_UTILS_INCLUDED
 
 #include "constants_list.hlsl"
+#include "vertex_utilities.hlsl"
 
 struct Lighting
 {
@@ -99,16 +100,17 @@ float intensity_spot(float3 world_normal, float4 world_position)
    return (attenuation.z * coefficient.z) * attenuation.x;
 }
 
-Lighting calculate(float3 world_normal, float4 world_position, 
+Lighting calculate(float3 normals, float4 world_position,
                    float4 static_diffuse_lighting)
 {
+   float3 world_normal = normals_to_world(normals);
+
    Lighting lighting;
 
-#ifdef LIGHTING_DIRECTIONAL
    lighting.diffuse.a = constant_0.x;
-
    lighting.diffuse.rgb = ambient(world_normal) + static_diffuse_lighting.rgb;
 
+#ifdef LIGHTING_DIRECTIONAL
    float4 intensity = constant_0.xxxz;
 
    intensity.x = intensity_directional(world_normal, light_directional_0_dir);

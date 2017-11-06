@@ -84,19 +84,6 @@ float3 decompress_normals(float3 normals)
    return normals.xyz * normaltex_decompress.xxx + normaltex_decompress.yyy;
 }
 
-float3 decompress_transform_normals(float3 normals)
-{
-   normals = decompress_normals(normals);
-
-   float3 world_normals;
-
-   world_normals.x = dot(normals, get_world_matrix_row(0).xyz);
-   world_normals.y = dot(normals, get_world_matrix_row(1).xyz);
-   world_normals.z = dot(normals, get_world_matrix_row(2).xyz);
-
-   return world_normals;
-}
-
 Binormals decompress_binormals(float3 binormal, float3 tangent)
 {
    Binormals binormals;
@@ -130,6 +117,17 @@ float4 position_project(float4 position)
 float4 position_to_world_project(float4 position)
 {
    return position_project(position_to_world(position));
+}
+
+float3 normals_to_world(float3 normals)
+{
+   float3 world_normals;
+
+   world_normals.x = dot(normals, get_world_matrix_row(0).xyz);
+   world_normals.y = dot(normals, get_world_matrix_row(1).xyz);
+   world_normals.z = dot(normals, get_world_matrix_row(2).xyz);
+
+   return world_normals;
 }
 
 float4 transform_shadowmap_coords(float4 world_position)

@@ -81,6 +81,15 @@ compile_function "prereflection" "prereflection_ps" "ps_2_0"
 
 compile_pass "rain" "rain_vs" "rain_ps"
 
+### Refraction Shader ###
+
+compile_function "refraction" "far_vs" "vs_2_0" $true $true
+compile_function "refraction" "nodistortion_vs" "vs_2_0" $true $true
+compile_function "refraction" "distortion_vs" "vs_2_0" $true $true
+compile_function "refraction" "far_ps" "ps_2_0"
+compile_function "refraction" "near_diffuse_ps" "ps_2_0"
+compile_function "refraction" "near_ps" "ps_2_0"
+
 ### Sample Shader ###
 
 compile_pass "sample" "sample_vs" "sample_ps"

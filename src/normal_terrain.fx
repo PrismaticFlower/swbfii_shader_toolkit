@@ -53,10 +53,10 @@ Vs_blendmap_output diffuse_blendmap_vs(Vs_input input)
    output.color_0.r = constant_0.z;
    output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
 
-   float3 world_normal = decompress_transform_normals(input.normal.xyz);
+   float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
 
-   Lighting lighting = light::diffuse::calculate(world_normal, world_position,
+   Lighting lighting = light::diffuse::calculate(normals, world_position,
                                                  static_diffuse_color);
 
    output.color_0.r = lighting.diffuse.w;
@@ -96,10 +96,10 @@ Vs_detail_output detailing_vs(Vs_input input)
 
    output.shadow_map_texcoords = transform_shadowmap_coords(world_position); 
 
-   float3 world_normal = decompress_transform_normals(input.normal.xyz);
+   float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
 
-   Lighting lighting = light::diffuse::calculate(world_normal,
+   Lighting lighting = light::diffuse::calculate(normals,
                                                  world_position,
                                                  static_diffuse_color);
 

@@ -12,7 +12,7 @@ namespace unskinned
 
 float4 position(float4 position, uint4 indices, float4 weights)
 {
-   return position_to_world(decompress_position(position));
+   return decompress_position(position);
 }
 
 float3 normals(float3 normals, uint4 indices, float4 weights)
@@ -43,7 +43,7 @@ float4 position(float4 position, uint4 indices, float4 weights)
    obj_position.z = dot(position, bone_matrices[2 + index]);
    obj_position.w = constant_0.z;
 
-   return position_to_world(obj_position);
+   return obj_position;
 }
 
 float3 normals(float3 normals, uint4 indices, float4 weights)
@@ -131,7 +131,7 @@ float4 position(float4 position, uint4 indices, float4 weights)
    obj_position.z = dot(position, skin[2]);
    obj_position.w = constant_0.z;
 
-   return position_to_world(obj_position);
+   return obj_position;
 }
 
 float3 normals(float3 normals, uint4 indices, float4 weights)
@@ -203,6 +203,13 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weigh
 #endif
 
 float4 position(float4 position, uint4 indices, float4 weights)
+{
+   float4 obj_position = skin_type_position(position, indices, weights);
+
+   return position_to_world(obj_position);
+}
+
+float4 position_obj(float4 position, uint4 indices, float4 weights)
 {
    return skin_type_position(position, indices, weights);
 }
