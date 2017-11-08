@@ -15,12 +15,12 @@ namespace light
 
 float3 ambient(float3 world_normal)
 {
-   float4 factor = world_normal.y * -constant_0.yyyy + constant_0.yyyy;
+   float factor = world_normal.y * -constant_0.y + constant_0.y;
 
    float3 color;
 
-   color.rgb = light_ambient_color_top.rgb * -factor.rgb + light_ambient_color_top.rgb;
-   color.rgb = light_ambient_color_bottom.rgb * factor.rgb + light_ambient_color_bottom.rgb;
+   color.rgb = light_ambient_color_top.rgb * -factor + light_ambient_color_top.rgb;
+   color.rgb = light_ambient_color_bottom.rgb * factor + color.rgb;
 
    return color;
 }
@@ -107,11 +107,11 @@ Lighting calculate(float3 normals, float4 world_position,
 
    Lighting lighting;
 
-   lighting.diffuse.a = constant_0.x;
+   lighting.diffuse = constant_0.x;
    lighting.diffuse.rgb = ambient(world_normal) + static_diffuse_lighting.rgb;
 
 #ifdef LIGHTING_DIRECTIONAL
-   float4 intensity = constant_0.xxxz;
+   float4 intensity = float4(lighting.diffuse.rgb, 1.0);
 
    intensity.x = intensity_directional(world_normal, light_directional_0_dir);
    lighting.diffuse += intensity.x * light_directional_0_color;
@@ -137,7 +137,7 @@ Lighting calculate(float3 normals, float4 world_position,
    lighting.diffuse += intensity.w * light_point_3_color;
 #elif defined(LIGHTING_SPOT_0)
    intensity.z = intensity_spot(world_normal, world_position);
-   lighting.diffuse += intensity.z * light_point_2_color;
+   lighting.diffuse += intensity.z * light_spot_color;
 #endif
 
    lighting.static_diffuse = static_diffuse_lighting;
@@ -148,8 +148,8 @@ Lighting calculate(float3 normals, float4 world_position,
    scale = max(scale, lighting.diffuse.z);
    scale = max(scale, constant_0.z);
    scale = rcp(scale);
-   lighting.static_diffuse.rgb * scale;
-   lighting.static_diffuse.rgb * hdr_info.zzz;
+   lighting.diffuse.rgb *= scale;
+   lighting.diffuse.rgb *= hdr_info.zzz;
 #else // LIGHTING_DIRECTIONAL
 
    lighting.diffuse = hdr_info.zzzw;
