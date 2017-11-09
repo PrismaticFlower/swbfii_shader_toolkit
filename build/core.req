@@ -31,9 +31,7 @@ ucft
    REQN
    {
       "shader"
-      "bump"
       "decal"
-      "detail"
       "filtercopy"
       "flare"
       "foliage"
@@ -51,11 +49,9 @@ ucft
       "rain"
       "refraction"
       "sample"
-      "scroll"
       "shadowquad"
       "shield"
       "skyfog"
-      "specmap"
       "specularlighting"
       "sprite"
       "stencilshadow"
