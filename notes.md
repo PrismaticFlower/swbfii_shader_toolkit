@@ -23,5 +23,6 @@ __Tested__ I am fairly certain work correctly.
 * foliage
 * ocean
 * hdr
-* terrain (it looks off though, but it does draw mostly correctly)
+* terrain
 * refraction
+* normal
