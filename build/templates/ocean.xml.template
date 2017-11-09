@@ -4,7 +4,7 @@
     <state id = "0">
       <pass transform = "normals" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~far_vs~
+          !~far_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~far_ps~
@@ -14,7 +14,7 @@
     <state id = "1">
       <pass transform = "normals" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~near_vs~
+          !~near_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~near_ps~

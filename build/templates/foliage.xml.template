@@ -2,11 +2,11 @@
 <shader rendertype = "foliage" skinned = "no" debuginfo = "no">
 
   <vertexshader name = "opaque_vs" target = "vs_2_0">
-    ~opaque_vs~
+    !~opaque_vs~!
   </vertexshader>
   
   <vertexshader name = "transparent_vs" target = "vs_2_0">
-    ~transparent_vs~
+    !~transparent_vs~!
   </vertexshader>
   
   <pipeline id = "2">

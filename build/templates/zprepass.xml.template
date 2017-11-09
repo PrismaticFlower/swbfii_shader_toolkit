@@ -2,7 +2,7 @@
 <shader rendertype = "zprepass" skinned = "yes" debuginfo = "no">
   <pipeline id = "2">
     <state id = "0">
-      <pass transform = "position" lighting = "none">
+      <pass transform = "position" lighting = "none" vertexcolor = "no" texcoord = "no">
         <vertexshader target = "vs_2_0">
           #opaque_vs#
         </vertexshader>
@@ -12,9 +12,9 @@
       </pass>
     </state>
     <state id = "1">
-      <pass transform = "position" lighting = "none">
+      <pass transform = "position" lighting = "none" texcoord = "yes">
         <vertexshader target = "vs_2_0">
-          #hardedged_vs#
+          !#hardedged_vs#!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~hardedged_ps~

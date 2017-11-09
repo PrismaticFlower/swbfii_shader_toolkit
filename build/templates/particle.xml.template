@@ -4,7 +4,7 @@
     <state id = "0">
       <pass transform = "position" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~normal_vs~
+          !~normal_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~normal_ps~
@@ -14,7 +14,7 @@
     <state id = "1">
       <pass transform = "normals" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~blur_vs~
+          !~blur_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~blur_ps~

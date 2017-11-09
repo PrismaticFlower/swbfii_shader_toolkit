@@ -17,13 +17,15 @@ compile_function "filtercopy" "filtercopy_4tex_ps" "ps_2_0"
 
 ### Flare Shader ###
 
-compile_pass "flare" "flare_textured_vs" "flare_textured_ps"
-compile_pass "flare" "flare_untextured_vs" "flare_untextured_ps"
+compile_function "flare" "flare_textured_vs" "vs_2_0" $false $false "yes"
+compile_function "flare" "flare_untextured_vs" "vs_2_0" $false $false "yes"
+compile_function "flare" "flare_textured_ps" "ps_2_0"
+compile_function "flare" "flare_untextured_ps" "ps_2_0"
 
 ### Foliage Shader ###
 
-compile_function "foliage" "opaque_vs" "vs_2_0"
-compile_function "foliage" "transparent_vs" "vs_2_0"
+compile_function "foliage" "opaque_vs" "vs_2_0" $false $false "yes"
+compile_function "foliage" "transparent_vs" "vs_2_0" $false $false "yes"
 compile_function "foliage" "hardedged_ps" "ps_2_0"
 compile_function "foliage" "transparent_hardedged_ps" "ps_2_0"
 compile_function "foliage" "shadow_hardedged_ps" "ps_2_0"
@@ -47,29 +49,64 @@ compile_pass "interface" "bitmap_textured_vs" "bitmap_textured_ps"
 
 ### Lightbeam Shader ###
 
-compile_pass "lightbeam" "lightbeam_vs" "lightbeam_ps"
+compile_function "lightbeam" "lightbeam_vs" "vs_2_0" $false $false "yes"
+compile_function "lightbeam" "lightbeam_ps" "ps_2_0"
+
+### Normal Shader ###
+
+compile_function "normal" "unlit_opaque_vs" "vs_2_0" $true $false "yes"
+compile_function "normal" "unlit_transparent_vs" "vs_2_0" $true $false "yes"
+compile_function "normal" "near_opaque_vs" "vs_2_0" $true $true "yes"
+compile_function "normal" "near_opaque_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
+compile_function "normal" "near_transparent_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
+compile_function "normal" "unlit_opaque_ps" "ps_2_0"
+compile_function "normal" "unlit_opaque_hardedged_ps" "ps_2_0"
+compile_function "normal" "unlit_transparent_ps" "ps_2_0"
+compile_function "normal" "unlit_transparent_hardedged_ps" "ps_2_0"
+compile_function "normal" "near_opaque_ps" "ps_2_0"
+compile_function "normal" "near_opaque_hardedged_ps" "ps_2_0"
+compile_function "normal" "near_transparent_ps" "ps_2_0"
+compile_function "normal" "near_transparent_hardedged_ps" "ps_2_0"
+compile_function "normal" "near_opaque_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_opaque_hardedged_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_transparent_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_transparent_hardedged_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_opaque_shadow_ps" "ps_2_0"
+compile_function "normal" "near_opaque_hardedged_shadow_ps" "ps_2_0"
+compile_function "normal" "near_opaque_shadow_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_opaque_hardedged_shadow_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_transparent_shadow_ps" "ps_2_0"
+compile_function "normal" "near_transparent_hardedged_shadow_ps" "ps_2_0"
+compile_function "normal" "near_transparent_shadow_projectedtex_ps" "ps_2_0"
+compile_function "normal" "near_transparent_hardedged_shadow_projectedtex_ps" "ps_2_0"
 
 ### Normal terrain Shader ###
 
-compile_function "normal_terrain" "diffuse_blendmap_vs" "vs_2_0" $false $true
-compile_function "normal_terrain" "detailing_vs" "vs_2_0" $false $true
+compile_function "normal_terrain" "diffuse_blendmap_vs" "vs_2_0" $false $true "always"
+compile_function "normal_terrain" "detailing_vs" "vs_2_0" $false $true "always"
 compile_function "normal_terrain" "diffuse_blendmap_ps" "ps_2_0"
 compile_function "normal_terrain" "detailing_ps" "ps_2_0"
 
 ### Normalmapadder Shader ###
 
-compile_pass "normalmapadder" "normalmapadder_vs" "normalmapadder_ps"
-compile_pass "normalmapadder" "normalmapadder_binormals_vs" "normalmapadder_binormals_ps"
+compile_function "normalmapadder" "normalmapadder_vs" "vs_2_0" $false $false "no"
+compile_function "normalmapadder" "normalmapadder_binormals_vs" "vs_2_0" $false $false "yes"
+compile_function "normalmapadder" "normalmapadder_ps" "ps_2_0" 
+compile_function "normalmapadder" "normalmapadder_binormals_ps" "ps_2_0" 
 
 ### Ocean Shader ###
 
-compile_pass "ocean" "far_vs" "far_ps"
-compile_pass "ocean" "near_vs" "near_ps"
+compile_function "ocean" "far_vs" "vs_2_0" $false $false "yes"
+compile_function "ocean" "near_vs" "vs_2_0" $false $false "yes"
+compile_function "ocean" "far_ps" "ps_2_0" 
+compile_function "ocean" "near_ps" "ps_2_0" 
 
 ### Particle Shader ###
 
-compile_pass "particle" "normal_vs" "normal_ps"
-compile_pass "particle" "blur_vs" "blur_ps"
+compile_function "particle" "normal_vs" "vs_2_0" $false $false "yes"
+compile_function "particle" "blur_vs" "vs_2_0" $false $false "yes"
+compile_function "particle" "normal_ps" "ps_2_0" 
+compile_function "particle" "blur_ps" "ps_2_0" 
 
 ### Prereflection Shader ###
 
@@ -79,13 +116,14 @@ compile_function "prereflection" "prereflection_ps" "ps_2_0"
 
 ### Rain Shader ###
 
-compile_pass "rain" "rain_vs" "rain_ps"
+compile_function "rain" "rain_vs" "vs_2_0" $false $false "yes"
+compile_function "rain" "rain_ps" "ps_2_0"
 
 ### Refraction Shader ###
 
-compile_function "refraction" "far_vs" "vs_2_0" $true $true
-compile_function "refraction" "nodistortion_vs" "vs_2_0" $true $true
-compile_function "refraction" "distortion_vs" "vs_2_0" $true $true
+compile_function "refraction" "far_vs" "vs_2_0" $true $true "yes"
+compile_function "refraction" "nodistortion_vs" "vs_2_0" $true $true "yes"
+compile_function "refraction" "distortion_vs" "vs_2_0" $true $true "yes"
 compile_function "refraction" "far_ps" "ps_2_0"
 compile_function "refraction" "near_diffuse_ps" "ps_2_0"
 compile_function "refraction" "near_ps" "ps_2_0"
@@ -108,12 +146,13 @@ compile_pass "skyfog" "skyfog_vs" "skyfog_ps"
 
 ### Sprite Shader ###
 
-compile_pass "sprite" "sprite_vs" "sprite_ps"
+compile_function "sprite" "sprite_vs" "vs_2_0" $false $false "yes"
+compile_function "sprite" "sprite_ps" "ps_2_0"
 
 ### Z-Prepass Shader ###
 
 compile_function "zprepass" "opaque_vs" "vs_2_0" $true
-compile_function "zprepass" "hardedged_vs" "vs_2_0" $true
+compile_function "zprepass" "hardedged_vs" "vs_2_0" $true $false "yes"
 compile_function "zprepass" "opaque_ps" "ps_2_0"
 compile_function "zprepass" "hardedged_ps" "ps_2_0"
 

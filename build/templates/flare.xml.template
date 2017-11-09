@@ -2,9 +2,9 @@
 <shader rendertype = "flare" skinned = "no" debuginfo = "no">
   <pipeline id = "2">
     <state id = "0">
-      <pass transform = "none" lighting = "none">
+      <pass transform = "position" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~flare_textured_vs~
+          !~flare_textured_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~flare_textured_ps~
@@ -12,9 +12,9 @@
       </pass>
     </state>
     <state id = "1">
-      <pass transform = "none" lighting = "none">
+      <pass transform = "position" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~flare_untextured_vs~
+          !~flare_untextured_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~flare_untextured_ps~

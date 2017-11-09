@@ -2,9 +2,9 @@
 <shader rendertype = "sprite" skinned = "no" debuginfo = "no">
   <pipeline id = "2">
     <state id = "0">
-      <pass transform = "none" lighting = "none">
+      <pass transform = "position" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~sprite_vs~
+          !~sprite_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~sprite_ps~

@@ -12,7 +12,7 @@
       </pass>
     </state>
     <state id = "1">
-      <pass transform = "none" lighting = "none">
+      <pass transform = "none" lighting = "none" vertexcolor = "yes">
         <vertexshader target = "vs_2_0">
           ~vector_vs~
         </vertexshader>

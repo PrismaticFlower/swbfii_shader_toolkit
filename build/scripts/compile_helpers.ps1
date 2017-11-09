@@ -6,7 +6,8 @@
 }
 
 function global:compile_function($shader, $func_name, $profile, 
-                                 $skinned = $false, $lighting = $false)
+                                 $skinned = $false, $lighting = $false,
+                                 $vertexcolor = "no")
 {
     $transform_pass_defines = @('')
     $transform_pass_names = @('')
@@ -44,6 +45,20 @@ function global:compile_function($shader, $func_name, $profile,
                                  
         $lighting_pass_names = "_2d", "_2d1p", "_2d2p", "_2d4p", "_2d1s", "_2d1p1s", "_2d2p1s", ""
     }
+    
+    $color_pass_defines = @('')
+    $color_pass_names = @('')
+    
+    if ($vertexcolor -eq "yes")
+    {
+        $color_pass_defines = @('/DUSE_VETREX_COLOR' ,'')
+        $color_pass_names = @('_vertexcolored', '')
+    }
+    elseif ($vertexcolor -eq "always")
+    {  
+        $color_pass_defines = @('/DUSE_VETREX_COLOR')
+        $color_pass_names = @('_vertexcolored')
+    }
 
     for ($i = 0; $i -lt $transform_pass_names.length; ++$i)
     {
@@ -54,37 +69,44 @@ function global:compile_function($shader, $func_name, $profile,
         {
             $lighting_defines = $lighting_pass_defines[$j]
             $lighting_name = $lighting_pass_names[$j]
-
-            $asm_path = "build\asm\${shader}_${func_name}${transform_name}${lighting_name}.asm"
-
-            # skip compiling the function if it's been recently compiled.
-            if (-not (function_needs_compiling "src/$shader.fx" $asm_path)) { continue };
-            
-            Write-Host "Compiling $asm_path"
-
-            $function = fxc /nologo $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx
-
-            if ($LASTEXITCODE -ne 0) 
+                
+            for ($z = 0; $z -lt $color_pass_defines.length; ++$z)
             {
-                throw "compilation failure!", "fxc /nologo $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx"
+                $color_define = $color_pass_defines[$z]
+                $color_name = $color_pass_names[$z]
+
+                $asm_path = "build\asm\${shader}_${func_name}${color_name}${transform_name}${lighting_name}.asm"
+                
+                # skip compiling the function if it's been recently compiled.
+                if (-not (function_needs_compiling "src/$shader.fx" $asm_path)) { continue };
+                
+                Write-Host "Compiling $asm_path"
+                
+                $function = fxc /nologo $color_define $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx
+                
+                if ($LASTEXITCODE -ne 0) 
+                {
+                    throw "compilation failure!", "fxc /nologo $color_define $lighting_defines $transform_define /T $profile /E $func_name /Cc /Zi /O3 src/$shader.fx"
+                }
+                
+                # Clean string so it is safe to pass through the munger.
+                $function = $function -replace $profile, ""
+                $function = $function -replace "#line", "// line"
+                $function = $function -replace "<", "("
+                $function = $function -replace ">", ")"
+                
+                $function | Out-File -Encoding utf8 "${asm_path}"
             }
-
-            # Clean string so it is safe to pass through the munger.
-            $function = $function -replace $profile, ""
-            $function = $function -replace "#line", "// line"
-            $function = $function -replace "<", "("
-            $function = $function -replace ">", ")"
-
-            $function | Out-File -Encoding utf8 "${asm_path}"
         }
     }
 }
 
 function global:compile_pass($shader, $vs_func, $ps_func, 
-                             $skinned = $false, $lighting = $false)
+                             $skinned = $false, $lighting = $false,
+                             $vertexcolor = "no")
 {
-    compile_function $shader $vs_func "vs_2_0" $skinned $lighting
-    compile_function $shader $ps_func "ps_2_0" $skinned $lighting
+    compile_function $shader $vs_func "vs_2_0" $skinned $lighting $vertexcolor
+    compile_function $shader $ps_func "ps_2_0" $skinned $lighting $vertexcolor
 }
 
 function global:instantiate_transform($name)
@@ -140,11 +162,33 @@ ${hard_skinned_lighting}
 "@
 }
 
+function global:instantiate_vertexcolor($token_char, $name)
+{
+@"
+#ifdef __OPTION_DECLARE_COLOR__
+    ${token_char}${name}_vertexcolored${token_char}
+#else
+    ${token_char}${name}${token_char}
+#endif
+"@
+}
 function global:instantiate_template($name)
 {
     Write-Host "Instantiating ${name}.xml.template"
 
     $template = Get-Content -Raw "build\templates\${name}.xml.template"
+    
+    # instantiate vertex color definitions
+    $tokens = Select-String "!.+?!" -input $template -AllMatches
+
+    foreach ($token in $tokens.matches)
+    {
+       $func = $token -replace "!", ""
+       $func_token = $func[0]
+       $func = $func -replace $func_token, ""
+
+       $template = $template -replace $token, (instantiate_vertexcolor $func_token $func)
+    }
 
     # instantiate transform definitions
     $tokens = Select-String "#.+?#" -input $template -AllMatches

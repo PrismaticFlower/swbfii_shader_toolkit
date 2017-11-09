@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader rendertype = "rain" skinned = "no" debuginfo = "no">
+<shader rendertype = "rain" skinned = "no" debuginfo = "no" texcoord = "never">
   <pipeline id = "2">
     <state id = "0">
       <pass transform = "none" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~rain_vs~
+          !~rain_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~rain_ps~

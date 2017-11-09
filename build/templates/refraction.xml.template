@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader rendertype = "refraction" skinned = "yes" debuginfo = "no">
   <vertexshader name = "far_vs" target = "vs_2_0">
-    %far_vs%
+    !%far_vs%!
   </vertexshader>
 
   <vertexshader name = "nodistortion_vs" target = "vs_2_0">
-    %nodistortion_vs%
+    !%nodistortion_vs%!
   </vertexshader>
   
   <vertexshader name = "distortion_vs" target = "vs_2_0">
-    %distortion_vs%
+    !%distortion_vs%!
   </vertexshader>
   
   <pixelshader name = "far_ps" target = "ps_2_0">

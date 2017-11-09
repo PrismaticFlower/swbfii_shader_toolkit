@@ -14,7 +14,7 @@
     <state id = "1">
       <pass transform = "binormals" lighting = "none">
         <vertexshader target = "vs_2_0">
-          ~normalmapadder_binormals_vs~
+          !~normalmapadder_binormals_vs~!
         </vertexshader>
         <pixelshader target = "ps_2_0">
           ~normalmapadder_binormals_ps~
