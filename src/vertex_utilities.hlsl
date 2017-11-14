@@ -138,6 +138,21 @@ float3 normals_to_world(float3 normals)
    return world_normals;
 }
 
+Binormals binormals_to_world(Binormals binormals)
+{
+   Binormals world_binormals;
+
+   world_binormals.s.x = dot(binormals.s, get_world_matrix_row(0).xyz);
+   world_binormals.s.y = dot(binormals.s, get_world_matrix_row(1).xyz);
+   world_binormals.s.z = dot(binormals.s, get_world_matrix_row(2).xyz);
+
+   world_binormals.t.x = dot(binormals.t, get_world_matrix_row(0).xyz);
+   world_binormals.t.y = dot(binormals.t, get_world_matrix_row(1).xyz);
+   world_binormals.t.z = dot(binormals.t, get_world_matrix_row(2).xyz);
+
+   return world_binormals;
+}
+
 float4 transform_shadowmap_coords(float4 world_position)
 {
    float4 coords;

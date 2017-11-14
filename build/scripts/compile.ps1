@@ -108,6 +108,23 @@ compile_function "particle" "blur_vs" "vs_2_0" $false $false "yes"
 compile_function "particle" "normal_ps" "ps_2_0" 
 compile_function "particle" "blur_ps" "ps_2_0" 
 
+### Perpixeldiffuselighting Shader ###
+
+compile_function "perpixeldiffuselighting" "lights_3_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "lights_3_genbinormals_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "lights_3_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "lights_3_normalmap_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "lights_2_normalmap_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "lights_1_normalmap_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "lights_3_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "lights_2_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "lights_1_ps" "ps_2_0" 
+compile_function "perpixeldiffuselighting" "spotlight_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "spotlight_genbinormals_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "spotlight_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
+compile_function "perpixeldiffuselighting" "spotlight_normalmap_ps" "ps_2_0"
+compile_function "perpixeldiffuselighting" "spotlight_ps" "ps_2_0"
+
 ### Prereflection Shader ###
 
 compile_function "prereflection" "prereflection_vs" "vs_2_0"

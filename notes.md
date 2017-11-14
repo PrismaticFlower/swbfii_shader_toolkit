@@ -26,3 +26,4 @@ __Tested__ I am fairly certain work correctly.
 * terrain
 * refraction
 * normal
+* perpixeldiffuselighting
