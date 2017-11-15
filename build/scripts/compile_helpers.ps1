@@ -138,7 +138,7 @@ function global:instantiate_lighting($name)
 #elif defined(LIGHTING_2D2P1S)
     ~${name}_2d2p1s~
 #elif defined(LIGHTING_2D1S)
-    ~${name}_2d2p1s~
+    ~${name}_2d1s~
 #else
     ~${name}~
 #endif
