@@ -133,7 +133,7 @@ compile_function "prereflection" "prereflection_ps" "ps_2_0"
 
 ### Rain Shader ###
 
-compile_function "rain" "rain_vs" "vs_2_0" $false $false "yes"
+compile_function "rain" "rain_vs" "vs_2_0" $false $false "always"
 compile_function "rain" "rain_ps" "ps_2_0"
 
 ### Refraction Shader ###
