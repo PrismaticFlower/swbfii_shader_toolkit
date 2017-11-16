@@ -293,9 +293,14 @@ float3 calculate_light_normalmap(float3 world_position, float3 texel_normal,
    attenuation = saturate(attenuation);
    attenuation *= attenuation;
 
-   float difference = saturate(dot(light_normal, texel_normal));
+   if (light_position.w == 0.0) {
+      light_normal = normalize(world_position - light_position.xyz);
 
-   if (light_position.w == 0.0) attenuation = saturate(dot(light_normal, world_normal));
+      // TODO: Fix this once Shader Model 3.0 is supported.
+      // attenuation = saturate(dot(light_normal, world_normal));
+   }
+
+   float difference = saturate(dot(light_normal, texel_normal));
 
    return attenuation * (light_color.rgb * difference);
 }
@@ -344,7 +349,7 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
    }
    if (light_count >= 3) {
       color += calculate_light_normalmap(input.world_position, texel_normal,
-                                         input.normal, input.light_position_2, 
+                                         input.normal, input.light_position_2,
                                          light_colors[2]);
    }
 
