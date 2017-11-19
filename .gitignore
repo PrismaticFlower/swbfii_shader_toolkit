@@ -4,6 +4,8 @@
 # Ignore folders used during the compile process
 build/asm/
 build/xml/
+build/bin/
+build/checksums/
 
 # Ignore munged files folders
 build/munged/
