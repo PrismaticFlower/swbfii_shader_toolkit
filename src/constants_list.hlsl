@@ -14,7 +14,7 @@ float4 constant_1 : register(vs, c[1]);
 // world space to projection space matrix
 float4x4 projection_matrix : register(vs, c[2]);
 
-// presumably holds the position of the view for some shaders?
+// the position of the camera
 float4 world_view_position : register(vs, c[6]);
 
 // (camera fog scale, camera fog offset, world fog scale, world fog offset)
