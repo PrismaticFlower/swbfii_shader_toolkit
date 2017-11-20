@@ -284,22 +284,28 @@ float3 calculate_light_normalmap(float3 world_position, float3 texel_normal,
                                  float3 world_normal, float4 light_position,
                                  float4 light_color)
 {
-   float3 light_normal = normalize(light_position.xyz - world_position);
+   float3 light_direction;
+   float attenuation;
+   
+   if (light_position.w == 0) {
+      light_direction =  -light_position.xyz;
+      attenuation = saturate(dot(world_normal, light_direction));
+   }
+   else {
+      light_direction = light_position.xyz - world_position;
 
-   float light_distance = distance(world_position, light_position.xyz);
-   float radius = light_position.w;
+      float distance = length(light_direction);
 
-   float attenuation = 1.0 - light_distance * light_distance / (radius * radius);
-   attenuation = saturate(attenuation);
-   attenuation *= attenuation;
+      light_direction = normalize(light_direction);
 
-   if (light_position.w == 0.0) {
-      light_normal = normalize(world_position - light_position.xyz);
+      float radius = light_position.w;
 
-      attenuation = saturate(dot(light_normal, world_normal));
+      attenuation = 1.0 - distance * distance / (radius * radius);
+      attenuation = saturate(attenuation);
+      attenuation *= attenuation;
    }
 
-   float difference = saturate(dot(light_normal, texel_normal));
+   float difference = saturate(dot(light_direction, texel_normal));
 
    return attenuation * (light_color.rgb * difference);
 }
@@ -307,17 +313,27 @@ float3 calculate_light_normalmap(float3 world_position, float3 texel_normal,
 float3 calculate_light(float3 world_position, float3 world_normal, float4 light_position,
                        float4 light_color)
 {
-   float3 light_normal = normalize(light_position.xyz - world_position);
+   float3 light_direction;
+   float attenuation;
 
-   float light_distance = distance(world_position, light_position.xyz);
-   float radius = light_position.w;
+   if (light_position.w == 0) {
+      light_direction = -light_position.xyz;
+      attenuation = saturate(dot(world_normal, light_direction));
+   }
+   else {
+      light_direction = light_position.xyz - world_position;
 
-   float attenuation = 1.0 - light_distance * light_distance / (radius * radius);
-   attenuation = saturate(attenuation);
-   attenuation *= attenuation;
+      float distance = length(light_direction);
 
-   if (light_position.w == 0.0) attenuation = saturate(dot(light_normal, world_normal));
+      light_direction = normalize(light_direction);
 
+      float radius = light_position.w;
+
+      attenuation = 1.0 - distance * distance / (radius * radius);
+      attenuation = saturate(attenuation);
+      attenuation *= attenuation;
+   }
+   
    return attenuation * light_color.rgb;
 }
 
@@ -330,11 +346,6 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
                             texel_normal.z * input.normal);
 
    float3 color = input.ambient_color;
-
-   // This code depends on the compilers dead code elimination
-   // in theory it should work all the time. If it doesn't
-   // then lights_*_normalmap_ps will need to have this code
-   // hoisted out into it.
 
    if (light_count >= 1) {
       color += calculate_light_normalmap(input.world_position, texel_normal,
@@ -359,8 +370,7 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
 
 float4 lights_3_normalmap_ps(Ps_3lights_input input) : COLOR
 {
-   // TODO: Change this to 3 once Shader Model 3.0 is supported.
-   return lights_normalmap_ps(input, 2);
+   return lights_normalmap_ps(input, 3);
 }
 
 float4 lights_2_normalmap_ps(Ps_3lights_input input) : COLOR
