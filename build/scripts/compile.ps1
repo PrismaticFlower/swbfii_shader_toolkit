@@ -54,38 +54,38 @@ compile_function "lightbeam" "lightbeam_ps" "ps_2_0"
 
 ### Normal Shader ###
 
-compile_function "normal" "unlit_opaque_vs" "vs_2_0" $true $false "yes"
-compile_function "normal" "unlit_transparent_vs" "vs_2_0" $true $false "yes"
-compile_function "normal" "near_opaque_vs" "vs_2_0" $true $true "yes"
-compile_function "normal" "near_opaque_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
-compile_function "normal" "near_transparent_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
-compile_function "normal" "unlit_opaque_ps" "ps_2_0"
-compile_function "normal" "unlit_opaque_hardedged_ps" "ps_2_0"
-compile_function "normal" "unlit_transparent_ps" "ps_2_0"
-compile_function "normal" "unlit_transparent_hardedged_ps" "ps_2_0"
-compile_function "normal" "near_opaque_ps" "ps_2_0"
-compile_function "normal" "near_opaque_hardedged_ps" "ps_2_0"
-compile_function "normal" "near_transparent_ps" "ps_2_0"
-compile_function "normal" "near_transparent_hardedged_ps" "ps_2_0"
-compile_function "normal" "near_opaque_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_opaque_hardedged_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_transparent_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_transparent_hardedged_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_opaque_shadow_ps" "ps_2_0"
-compile_function "normal" "near_opaque_hardedged_shadow_ps" "ps_2_0"
-compile_function "normal" "near_opaque_shadow_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_opaque_hardedged_shadow_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_transparent_shadow_ps" "ps_2_0"
-compile_function "normal" "near_transparent_hardedged_shadow_ps" "ps_2_0"
-compile_function "normal" "near_transparent_shadow_projectedtex_ps" "ps_2_0"
-compile_function "normal" "near_transparent_hardedged_shadow_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "unlit_opaque_vs" "vs_2_0" $true $false "yes"
+#compile_function "normal" "unlit_transparent_vs" "vs_2_0" $true $false "yes"
+#compile_function "normal" "near_opaque_vs" "vs_2_0" $true $true "yes"
+#compile_function "normal" "near_opaque_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
+#compile_function "normal" "near_transparent_shadow_projectedtex_vs" "vs_2_0" $true $true "yes"
+#compile_function "normal" "unlit_opaque_ps" "ps_2_0"
+#compile_function "normal" "unlit_opaque_hardedged_ps" "ps_2_0"
+#compile_function "normal" "unlit_transparent_ps" "ps_2_0"
+#compile_function "normal" "unlit_transparent_hardedged_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_hardedged_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_hardedged_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_hardedged_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_hardedged_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_shadow_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_hardedged_shadow_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_shadow_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_opaque_hardedged_shadow_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_shadow_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_hardedged_shadow_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_shadow_projectedtex_ps" "ps_2_0"
+#compile_function "normal" "near_transparent_hardedged_shadow_projectedtex_ps" "ps_2_0"
 
 ### Normal terrain Shader ###
 
-compile_function "normal_terrain" "diffuse_blendmap_vs" "vs_2_0" $false $true "always"
-compile_function "normal_terrain" "detailing_vs" "vs_2_0" $false $true "always"
-compile_function "normal_terrain" "diffuse_blendmap_ps" "ps_2_0"
-compile_function "normal_terrain" "detailing_ps" "ps_2_0"
+#compile_function "normal_terrain" "diffuse_blendmap_vs" "vs_2_0" $false $true "always"
+#compile_function "normal_terrain" "detailing_vs" "vs_2_0" $false $true "always"
+#compile_function "normal_terrain" "diffuse_blendmap_ps" "ps_2_0"
+#compile_function "normal_terrain" "detailing_ps" "ps_2_0"
 
 ### Normalmapadder Shader ###
 
@@ -110,20 +110,20 @@ compile_function "particle" "blur_ps" "ps_2_0"
 
 ### Perpixeldiffuselighting Shader ###
 
-compile_function "perpixeldiffuselighting" "lights_3_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "lights_3_genbinormals_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "lights_3_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "lights_3_normalmap_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "lights_2_normalmap_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "lights_1_normalmap_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "lights_3_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "lights_2_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "lights_1_ps" "ps_2_0" 
-compile_function "perpixeldiffuselighting" "spotlight_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "spotlight_genbinormals_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "spotlight_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
-compile_function "perpixeldiffuselighting" "spotlight_normalmap_ps" "ps_2_0"
-compile_function "perpixeldiffuselighting" "spotlight_ps" "ps_2_0"
+#compile_function "perpixeldiffuselighting" "lights_3_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "lights_3_genbinormals_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "lights_3_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "lights_3_normalmap_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "lights_2_normalmap_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "lights_1_normalmap_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "lights_3_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "lights_2_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "lights_1_ps" "ps_2_0" 
+#compile_function "perpixeldiffuselighting" "spotlight_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "spotlight_genbinormals_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "spotlight_genbinormals_terrain_vs" "vs_2_0" $true $false "yes"
+#compile_function "perpixeldiffuselighting" "spotlight_normalmap_ps" "ps_2_0"
+#compile_function "perpixeldiffuselighting" "spotlight_ps" "ps_2_0"
 
 ### Prereflection Shader ###
 
@@ -168,10 +168,10 @@ compile_function "sprite" "sprite_ps" "ps_2_0"
 
 ### Z-Prepass Shader ###
 
-compile_function "zprepass" "opaque_vs" "vs_2_0" $true
-compile_function "zprepass" "hardedged_vs" "vs_2_0" $true $false "yes"
-compile_function "zprepass" "opaque_ps" "ps_2_0"
-compile_function "zprepass" "hardedged_ps" "ps_2_0"
+#compile_function "zprepass" "opaque_vs" "vs_2_0" $true
+#compile_function "zprepass" "hardedged_vs" "vs_2_0" $true $false "yes"
+#compile_function "zprepass" "opaque_ps" "ps_2_0"
+#compile_function "zprepass" "hardedged_ps" "ps_2_0"
 
 foreach ($file in Get-ChildItem -File -Path build\templates\* -Include *.xml.template)
 {

@@ -1,4 +1,6 @@
 {
+  "rendertype": "zprepass",
+
   "states": [
     {
       "name": "opaque",

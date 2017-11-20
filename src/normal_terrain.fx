@@ -106,10 +106,8 @@ Vs_detail_output detailing_vs(Vs_input input)
    float4 material_color = get_material_color(input.color);
 
    output.color_1 = material_color.rgb * lighting.static_diffuse.a;
-   output.color_1 *= light_proj_selector.rgb;
+   output.color_1 *= light_proj_color.rgb;
 
-   output.color_0.rgb = lighting.diffuse.rgb * terrain_constant.xxx + terrain_constant.yyy;
-   output.color_0.w = lighting.diffuse.w;
    output.color_0.rgb = lighting.diffuse.rgb;
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
@@ -173,14 +171,19 @@ struct Ps_detail_input
    float4 proj_lighting : COLOR1;
 };
 
-float4 detailing_ps(Ps_detail_input input, uniform sampler detail_maps[2],
-                    uniform sampler projection_map, uniform sampler shadow_map) : COLOR
+float4 detailing_ps(Ps_detail_input input, uniform sampler2D detail_maps[2],
+                    uniform sampler2D projection_map, uniform sampler2D shadow_map) : COLOR
 {
 
    float4 detail_color_0 = tex2D(detail_maps[0], input.detail_texcoord_0);
    float4 detail_color_1 = tex2D(detail_maps[1], input.detail_texcoord_1);
-   float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
    float4 shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords);
+   float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
+
+   // HACK: Ignore projected cube maps.
+   if (input.projection_texcoords.z != 0.0) {
+      projection_color = 1.0;
+   }
 
    float3 color = projection_color.rgb * input.lighting_color.rgb;
    float factor = lerp(0.8, shadow_map_color.a, 0.8);

@@ -1,4 +1,6 @@
 {
+  "rendertype": "perpixeldiffuselighting",
+
   "states": [
     {
       "name": "opaque no normal map 3 lights",

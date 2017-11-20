@@ -44,7 +44,6 @@ foreach ($file in Get-ChildItem -File -Path build\xml\* -Include *.xml)
 foreach ($file in Get-ChildItem -File -Path definitions\* -Include *.json)
 {
    $srcname = $file.Name -replace ".json", ".fx"
-   $rendertype = $file.Name -replace ".json", ""
    $outname = $file.Name -replace ".json", ".shader"
 
    $definition_changed = file_changed $file
@@ -55,7 +54,7 @@ foreach ($file in Get-ChildItem -File -Path definitions\* -Include *.json)
 
    Write-Host Munging $file.Name
 
-   ./build/bin/compiler $file.FullName "src\$srcname" $rendertype "build\munged\$outname"
+   ./build/bin/compiler $file.FullName "src\$srcname" "build\munged\$outname"
 }
 
 levelpack -inputfile "build/core.req" -sourcedir "build/premunged/" "build/munged/"

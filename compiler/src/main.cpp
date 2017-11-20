@@ -99,7 +99,7 @@ struct hash<
 }
 
 void compile(std::string_view def_path, std::string_view hlsl_path,
-             std::string_view render_type, std::string_view out_path);
+             std::string_view out_path);
 
 auto compile_state(const nlohmann::json& state_def, std::string_view hlsl_path,
                    std::string_view hlsl, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
@@ -144,14 +144,14 @@ constexpr D3D_SHADER_MACRO operator""_def(const char* chars, const std::size_t) 
 
 int main(int arg_count, char* args[])
 {
-   if (arg_count != 5) {
-      std::cout << "usage: <definition path> <hlsl path> <rendertype> <out path>\n";
+   if (arg_count != 4) {
+      std::cout << "usage: <definition path> <hlsl path> <out path>\n";
 
       return 0;
    }
 
    try {
-      compile(args[1], args[2], args[3], args[4]);
+      compile(args[1], args[2], args[3]);
    }
    catch (std::exception& e) {
       std::cerr << e.what() << '\n';
@@ -161,11 +161,13 @@ int main(int arg_count, char* args[])
 }
 
 void compile(std::string_view def_path, std::string_view hlsl_path,
-             std::string_view render_type, std::string_view out_path)
+             std::string_view out_path)
 {
    const auto hlsl = read_file(hlsl_path);
 
    const auto definition = open_definition(def_path);
+
+   const std::string render_type = definition["rendertype"];
 
    std::vector<Com_ptr<ID3DBlob>> vertex_shaders;
    std::vector<Com_ptr<ID3DBlob>> pixel_shaders;

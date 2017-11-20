@@ -1,4 +1,6 @@
 {
+  "rendertype": "normal",
+
   "states": [
     {
       "name": "unlit opaque",

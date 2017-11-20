@@ -1,4 +1,6 @@
 {
+  "rendertype": "specularlighting",
+
   "states": [
     {
       "name": "vertex lit specular",
