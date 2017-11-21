@@ -158,7 +158,7 @@ float4 far_ps(Ps_far_input input,
 
 float4 distort_alpha_constant : register(ps, c[0]);
 
-
+sampler bump_map : register(ps, s[0]);
 sampler distortion_map : register(ps, s[1]);
 sampler diffuse_map : register(ps, s[2]);
 sampler projection_map : register(ps, s[3]);
@@ -173,24 +173,21 @@ struct Ps_near_input
    float3 color_1 : COLOR1;
 };
 
-float4 near_diffuse_ps(Ps_near_input input, uniform sampler bump_map) : COLOR
+float4 near_diffuse_ps(Ps_near_input input) : COLOR
 {
-   float4 bump_color = tex2D(distortion_map, input.bump_texcoords);
    float4 distortion_color = tex2Dproj(distortion_map, input.distortion_texcoords);
    float4 diffuse_color = tex2D(diffuse_map, input.diffuse_texcoords);
    float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
 
-   float4 color;
+   float3 color;
 
-   color.rgb = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
-   color.rgb *= diffuse_color.rgb;
-
+   color = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
+   color *= diffuse_color.rgb;
 
    float alpha = -diffuse_color.a * distort_alpha_constant.a + diffuse_color.a;
-   color.rgb = lerp(distortion_color.rgb, diffuse_color.rgb, alpha);
-   color.a = input.color_0.a;
+   color = lerp(distortion_color.rgb, color, alpha);
 
-   return color;
+   return float4(color, input.color_0.a);
 }
 
 float4 near_ps(Ps_near_input input) : COLOR
@@ -198,16 +195,54 @@ float4 near_ps(Ps_near_input input) : COLOR
    float4 distortion_color = tex2Dproj(distortion_map, input.distortion_texcoords);
    float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
 
-   float4 color;
+   float3 color;
 
-   color.rgb = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
+   color = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
 
-   color.rgb = lerp(distortion_color.rgb, color.rgb, distort_alpha_constant.a);
-   color.a = input.color_0.a;
+   color = lerp(distortion_color.rgb, color, distort_alpha_constant.a);
 
-   return color;
+   return float4(color, input.color_0.a);
 }
 
-// Two pixel shaders are missing from this file because I was unable
-// to rewrite them successfully in HLSL. They are "near_diffuse_bump_ps" and
-// "near_bump_ps" respectively. Their assembly can be found in refraction.xml.template.
+float4 near_bump_ps(Ps_near_input input) : COLOR
+{
+   float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
+
+   float2 bump_offset = tex2D(bump_map, input.bump_texcoords).xy;
+   bump_offset = (bump_offset * 2.0) - 1.0;
+
+   float4 distortion_texcoords = input.distortion_texcoords;
+   distortion_texcoords.xy += (bump_offset.xy * 0.1);
+
+   float4 distortion_color = tex2Dproj(distortion_map, distortion_texcoords);
+
+   float3 color = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
+
+   color = lerp(distortion_color.rgb, color, distort_alpha_constant.a);
+
+   return float4(color, input.color_0.a);
+}
+
+float4 near_diffuse_bump_ps(Ps_near_input input) : COLOR
+{
+   float4 diffuse_color = tex2D(diffuse_map, input.diffuse_texcoords);
+   float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
+
+   float2 bump_offset = tex2D(bump_map, input.bump_texcoords).xy;
+   bump_offset = (bump_offset * 2.0) - 1.0;
+
+   float4 distortion_texcoords = input.distortion_texcoords;
+   distortion_texcoords.xy += (bump_offset.xy * 0.1);
+
+   float4 distortion_color = tex2Dproj(distortion_map, distortion_texcoords);
+
+   float3 color;
+
+   color = projection_color.rgb * input.color_1.rgb + input.color_0.rgb;
+   color *= diffuse_color.rgb;
+
+   float alpha = -diffuse_color.a * distort_alpha_constant.a + diffuse_color.a;
+   color = lerp(distortion_color.rgb, color, alpha);
+
+   return float4(color, input.color_0.a);
+}
