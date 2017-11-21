@@ -97,6 +97,54 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weigh
 
 }
 
+namespace hard_skinned
+{
+
+float4 position(float4 position, uint4 indices)
+{
+   int index = indices.x * constant_1.w;
+
+   position = decompress_position(position);
+
+   float3x4 skin = soft_skinned::get_bone_matrix(index);
+
+   return float4(mul(skin, position), constant_0.z);
+}
+
+float3 normals(float3 normals, uint4 indices)
+{
+   int index = indices.x * constant_1.w;
+
+   normals = decompress_normals(normals);
+
+   float3x4 skin = soft_skinned::get_bone_matrix(index);
+
+   float3 obj_normal = (float3) mul(skin, normals);
+
+   return normalize(obj_normal);
+}
+
+Binormals binormals(float3 binormal, float3 tangent, uint4 indices)
+{
+   int index = indices.x * constant_1.w;
+
+   Binormals binormals = decompress_binormals(binormal, tangent);
+
+   float3x4 skin = soft_skinned::get_bone_matrix(index);
+
+   Binormals obj_binormals;
+
+   obj_binormals.s = mul(skin, binormals.s);
+   obj_binormals.t = mul(skin, binormals.t);
+
+   obj_binormals.s = normalize(obj_binormals.s);
+   obj_binormals.t = normalize(obj_binormals.t);
+
+   return obj_binormals;
+}
+
+}
+
 #if defined(TRANSFORM_SOFT_SKINNED)
 #define skin_type_position soft_skinned::position
 #define skin_type_normals soft_skinned::normals
