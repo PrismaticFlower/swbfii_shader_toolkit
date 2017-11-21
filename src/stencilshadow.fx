@@ -77,7 +77,7 @@ float4 extend_directional_hardskin_gen_normal_vs(Vs_input_generate_normal input,
 
    for (uint i = 0; i < 3; ++i) {
       obj_positions[i] = transform::hard_skinned::position(input.positions[i],
-                                                           input.blend_indices[0]);
+                                                           input.blend_indices[0][i]);
    }
 
    float3 obj_normal = cross(obj_positions[2].xyz - obj_positions[1].xyz,
@@ -200,7 +200,7 @@ float4 extend_point_hardskin_gen_normal_vs(Vs_input_generate_normal input,
 
    for (uint i = 0; i < 3; ++i) {
       obj_positions[i] = transform::hard_skinned::position(input.positions[i],
-                                                           input.blend_indices[0]);
+                                                           input.blend_indices[0][i]);
    }
 
    float3 obj_normal = cross(obj_positions[2].xyz - obj_positions[1].xyz,
