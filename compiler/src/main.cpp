@@ -19,8 +19,6 @@
 
 using namespace std::literals;
 
-const auto vs_target = "vs_3_0";
-const auto ps_target = "ps_3_0";
 const auto compiler_flags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
 enum Vs_flags : std::uint32_t {
@@ -66,14 +64,15 @@ struct State {
    std::vector<Pass> passes;
 };
 
+// hash specializations for the compiler's cache
 namespace std {
 
 template<>
-struct hash<
-   std::pair<std::string_view, std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>> {
+struct hash<std::tuple<std::string_view, std::string_view,
+                       std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>> {
 
-   using Type =
-      std::pair<std::string_view, std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>;
+   using Type = std::tuple<std::string_view, std::string_view,
+                           std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>;
    using argument_type = Type;
    using result_type = std::size_t;
 
@@ -86,12 +85,36 @@ struct hash<
 
       std::size_t seed = 0;
 
-      combine(seed, value.first);
-      combine(seed, std::uint32_t{value.second.second});
+      combine(seed, std::get<0>(value));
+      combine(seed, std::get<1>(value));
+      combine(seed, std::uint32_t{std::get<2>(value).second});
 
-      for (const auto& define : value.second.first) {
+      for (const auto& define : std::get<2>(value).first) {
          if (define.Name != nullptr) combine(seed, define.Name);
       }
+
+      return seed;
+   }
+};
+
+template<>
+struct hash<std::pair<std::string_view, std::string_view>> {
+
+   using Type = std::pair<std::string_view, std::string_view>;
+   using argument_type = Type;
+   using result_type = std::size_t;
+
+   std::size_t operator()(const Type& value) const noexcept
+   {
+      const auto combine = [](std::size_t& seed, const auto& value) {
+         std::hash<std::decay_t<decltype(value)>> hasher{};
+         seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      };
+
+      std::size_t seed = 0;
+
+      combine(seed, std::get<0>(value));
+      combine(seed, std::get<1>(value));
 
       return seed;
    }
@@ -113,14 +136,14 @@ auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
 // sizes.
 auto compile_vertex_shader(
    std::string_view hlsl_path, std::string_view hlsl, std::string_view entry_point,
-   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+   std::string_view target, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
    const std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>& variation)
    -> std::uint32_t;
 
 // Not thread-safe, uses a static cache to boost compile times and reduce shader
 // sizes.
 auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
-                          std::string_view entry_point,
+                          std::string_view entry_point, std::string_view target,
                           std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> std::uint32_t;
 
 void save_shader(std::string_view render_type, std::string_view out_path,
@@ -208,6 +231,9 @@ auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
    const auto vs_variations = get_vs_variations(pass_def["skinned"], pass_def["lighting"],
                                                 pass_def["vertex_color"]);
 
+   const auto vs_target = pass_def.value("vs_target", "vs_3_0");
+   const auto ps_target = pass_def.value("ps_target", "ps_3_0");
+
    const std::string vs_entry_point = pass_def["vertex_shader"];
    const std::string ps_entry_point = pass_def["pixel_shader"];
 
@@ -215,25 +241,28 @@ auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
       pass.vs_shaders.emplace_back();
       pass.vs_shaders.back().flags = variation.second;
       pass.vs_shaders.back().index = compile_vertex_shader(
-         hlsl_path, hlsl, vs_entry_point, vertex_shaders, variation);
+         hlsl_path, hlsl, vs_entry_point, vs_target, vertex_shaders, variation);
    }
 
-   pass.ps_index = compile_pixel_shader(hlsl_path, hlsl, ps_entry_point, pixel_shaders);
+   pass.ps_index =
+      compile_pixel_shader(hlsl_path, hlsl, ps_entry_point, ps_target, pixel_shaders);
 
    return pass;
 }
 
 auto compile_vertex_shader(
    std::string_view hlsl_path, std::string_view hlsl, std::string_view entry_point,
-   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+   std::string_view target, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
    const std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>& variation) -> std::uint32_t
 {
-   using Cache_keypair =
-      std::pair<std::string_view, std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>;
+   using Cache_key_tuple =
+      std::tuple<std::string_view, std::string_view,
+                 std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>>;
 
    static std::unordered_map<std::uint32_t, std::uint32_t> cache;
 
-   const auto key = std::hash<Cache_keypair>{}(std::make_pair(entry_point, variation));
+   const auto key =
+      std::hash<Cache_key_tuple>{}(std::make_tuple(entry_point, target, variation));
 
    const auto cached = cache.find(key);
 
@@ -245,44 +274,56 @@ auto compile_vertex_shader(
 
    Com_ptr<ID3DBlob> error_message;
 
-   auto result = D3DCompile(
-      hlsl.data(), hlsl.length(), hlsl_path.data(), variation.first.data(),
-      D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), vs_target, compiler_flags,
-      NULL, vertex_shaders.back().clear_and_assign(), error_message.clear_and_assign());
+   auto result =
+      D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(), variation.first.data(),
+                 D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), target.data(),
+                 compiler_flags, NULL, vertex_shaders.back().clear_and_assign(),
+                 error_message.clear_and_assign());
 
    if (result != S_OK) {
       throw std::runtime_error{static_cast<char*>(error_message->GetBufferPointer())};
+   }
+   else if (error_message) {
+      std::cout << static_cast<char*>(error_message->GetBufferPointer());
    }
 
    return cache[key];
 }
 
 auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
-                          std::string_view entry_point,
+                          std::string_view entry_point, std::string_view target,
                           std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> std::uint32_t
 {
-   static std::unordered_map<std::string_view, std::uint32_t> cache;
+   using Cache_key_pair = std::pair<std::string_view, std::string_view>;
 
-   const auto cached = cache.find(entry_point);
+   static std::unordered_map<std::uint32_t, std::uint32_t> cache;
+
+   const auto key = std::hash<Cache_key_pair>{}(std::make_pair(entry_point, target));
+
+   const auto cached = cache.find(key);
 
    if (cached != std::cend(cache)) return cached->second;
 
-   cache[entry_point] = static_cast<std::uint32_t>(pixel_shaders.size());
+   cache[key] = static_cast<std::uint32_t>(pixel_shaders.size());
 
    pixel_shaders.emplace_back();
 
    Com_ptr<ID3DBlob> error_message;
 
-   auto result = D3DCompile(
-      hlsl.data(), hlsl.length(), hlsl_path.data(), nullptr,
-      D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), ps_target, compiler_flags,
-      NULL, pixel_shaders.back().clear_and_assign(), error_message.clear_and_assign());
+   auto result =
+      D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(), nullptr,
+                 D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), target.data(),
+                 compiler_flags, NULL, pixel_shaders.back().clear_and_assign(),
+                 error_message.clear_and_assign());
 
    if (result != S_OK) {
       throw std::runtime_error{static_cast<char*>(error_message->GetBufferPointer())};
    }
+   else if (error_message) {
+      std::cout << static_cast<char*>(error_message->GetBufferPointer());
+   }
 
-   return cache[entry_point];
+   return cache[key];
 }
 
 void save_shader(std::string_view render_type, std::string_view out_path,
