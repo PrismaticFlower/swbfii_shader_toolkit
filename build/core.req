@@ -44,7 +44,6 @@ ucft
       "ocean"
       "particle"
       "perpixeldiffuselighting"
-      "pervertexdiffuselighting"
       "prereflection"
       "rain"
       "refraction"
@@ -57,6 +56,21 @@ ucft
       "stencilshadow"
       "water"
       "zprepass"
+   }
+
+   REQN
+   {
+      "shader"
+
+      // Deprecated Shaders for which no implementation is provided
+      // by this toolkit. The game runs fine without them but just in
+      // case the toolkit includes them in their original munged form.
+
+      "bump"
+      "detail"
+      "pervertexdiffuselighting"
+      "scroll"
+      "specmap"
    }
 
    REQN
