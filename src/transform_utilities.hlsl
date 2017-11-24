@@ -1,6 +1,8 @@
 #ifndef TRANSFORM_UTILS_INCLUDED
 #define TRANSFORM_UTILS_INCLUDED
 
+#pragma warning(disable : 3206)
+
 #include "constants_list.hlsl"
 #include "vertex_utilities.hlsl"
 
@@ -73,7 +75,7 @@ float3 normals(float3 normals, uint4 indices, float4 weights)
    
    float3x4 skin = calculate_skin(weights, indices);
 
-   float3 obj_normal = (float3) mul(skin, normals);
+   float3 obj_normal = mul(skin, normals);
 
    return normalize(obj_normal);
 }
@@ -199,5 +201,7 @@ float4 position_project(float4 world_position)
 }
 
 }
+
+#pragma warning(default : 3206)
 
 #endif
