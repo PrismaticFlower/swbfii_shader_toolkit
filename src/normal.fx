@@ -551,7 +551,7 @@ float4 near_transparent_shadow_ps(Ps_shadow_input input) : COLOR
    color *= (1 - shadow_value);
    color.rgb = (color.rgb * detail_color.rgb) * 2.0;
 
-   color.a = lerp(1.0, diffuse_color.a, blend_constant.a) * input.color.a;
+   color.a = lerp(1.0, diffuse_color.a, blend_constant.b) * input.color.a;
 
    return color;
 }

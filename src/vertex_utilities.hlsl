@@ -177,8 +177,7 @@ Near_scene calculate_near_scene_fade(float4 world_position)
 
 Near_scene clamp_near_scene_fade(Near_scene near_scene)
 {
-   near_scene.fade = max(near_scene.fade, constant_0.x);
-   near_scene.fade = min(near_scene.fade, constant_0.z);
+   near_scene.fade = saturate(near_scene.fade);
 
    return near_scene;
 }
