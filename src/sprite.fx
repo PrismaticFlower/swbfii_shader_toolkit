@@ -1,6 +1,10 @@
 
 #include "vertex_utilities.hlsl"
 
+// Sprite shader. I am unsure what/if the game uses it for, it is listed as
+// deprecated in the modtools. This implementation was written before I knew 
+// that. It is likely useless and pointless.
+
 struct Vs_input
 {
    float4 position : POSITION;

@@ -2,6 +2,10 @@
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 
+// Deprecated Foliage shader, likely as a layover from the first game.
+// This implementation was written before I knew that. It is likely useless
+// and pointless.
+
 struct Vs_input
 {
    float4 position : POSITION;

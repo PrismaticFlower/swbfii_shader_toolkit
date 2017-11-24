@@ -89,10 +89,10 @@ compile_function "lightbeam" "lightbeam_ps" "ps_2_0"
 
 ### Normalmapadder Shader ###
 
-compile_function "normalmapadder" "normalmapadder_vs" "vs_2_0" $false $false "no"
-compile_function "normalmapadder" "normalmapadder_binormals_vs" "vs_2_0" $false $false "yes"
-compile_function "normalmapadder" "normalmapadder_ps" "ps_2_0" 
-compile_function "normalmapadder" "normalmapadder_binormals_ps" "ps_2_0" 
+#compile_function "normalmapadder" "normalmapadder_vs" "vs_2_0" $false $false "no"
+#compile_function "normalmapadder" "normalmapadder_binormals_vs" "vs_2_0" $false $false "yes"
+#compile_function "normalmapadder" "normalmapadder_ps" "ps_2_0" 
+#compile_function "normalmapadder" "normalmapadder_binormals_ps" "ps_2_0" 
 
 ### Ocean Shader ###
 
