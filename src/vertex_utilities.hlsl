@@ -96,7 +96,7 @@ Binormals decompress_binormals(float3 binormal, float3 tangent)
 
 float4 get_material_color(float4 color)
 {
-#ifdef USE_VETREX_COLOR
+#ifdef USE_VERTEX_COLOR
    return (color * color_state.yyyw + color_state.xxxz) * material_diffuse_color;
 #else
    return material_diffuse_color;
@@ -105,7 +105,7 @@ float4 get_material_color(float4 color)
 
 float4 get_static_diffuse_color(float4 color)
 {
-#ifdef USE_VETREX_COLOR
+#ifdef USE_VERTEX_COLOR
    return color * color_state.xxxz + color_state.zzzz;
 #else
    return constant_0.xxxx;

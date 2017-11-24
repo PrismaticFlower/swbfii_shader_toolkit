@@ -424,7 +424,7 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
    const auto nulldef = D3D_SHADER_MACRO{nullptr, nullptr};
    const auto unskinned_def = "TRANSFORM_UNSKINNED"_def;
    const auto skinned_def = "TRANSFORM_SOFT_SKINNED"_def;
-   const auto color_def = "USE_VETREX_COLOR"_def;
+   const auto color_def = "USE_VERTEX_COLOR"_def;
 
    const auto light_dir_def = "LIGHTING_DIRECTIONAL"_def;
    const auto light_point_def = "LIGHTING_POINT_0"_def;
