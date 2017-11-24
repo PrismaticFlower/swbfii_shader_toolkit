@@ -11,7 +11,7 @@
           "skinned": false,
           "lighting": false,
           "vertex_color": false,
-          "texture_coords": false,
+          "texture_coords": true,
           "transform": "none",
 
           "vertex_shader": "screenspace_vs",
@@ -29,7 +29,7 @@
           "skinned": false,
           "lighting": false,
           "vertex_color": false,
-          "texture_coords": false,
+          "texture_coords": true,
           "transform": "none",
 
           "vertex_shader": "screenspace_vs",
@@ -47,10 +47,10 @@
           "skinned": false,
           "lighting": false,
           "vertex_color": false,
-          "texture_coords": false,
+          "texture_coords": true,
           "transform": "none",
 
-          "vertex_shader": "screenspace_vs",
+          "vertex_shader": "bloomfilter_vs",
           "pixel_shader": "bloomfilter_ps"
         }
       ]
@@ -65,7 +65,7 @@
           "skinned": false,
           "lighting": false,
           "vertex_color": false,
-          "texture_coords": false,
+          "texture_coords": true,
           "transform": "none",
 
           "vertex_shader": "screenspace_vs",
