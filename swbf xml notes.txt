@@ -1,4 +1,0 @@
-
-vertexcolor = "?"
-
-Can appear at the top level shader settings or in a pass declaration. Controls if the current shader variation includes the vertex color or not. When at the top level it's value is "always" or "never" this value overrides pass declaration settings. When in a pass declaration can be "yes" or "no". Requires transform to not be set to "none". When transform is not set to "none" "yes" is the implicit value.

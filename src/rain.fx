@@ -1,4 +1,9 @@
 
+// Force the vertex color to be used.
+#ifndef USE_VERTEX_COLOR
+#define USE_VERTEX_COLOR
+#endif
+
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 

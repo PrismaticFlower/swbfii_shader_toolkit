@@ -1,3 +1,0 @@
-#ifndef TRANSFORM_UNSKINNED
-#define TRANSFORM_UNSKINNED
-#endif

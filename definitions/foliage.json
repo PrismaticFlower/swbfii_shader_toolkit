@@ -1,0 +1,77 @@
+{
+  "rendertype": "foliage",
+
+  "states": [
+    {
+      "name": "opaque hardedged",
+      "id": 0,
+
+      "passes": [
+        {
+          "skinned": false,
+          "lighting": false,
+          "vertex_color": true,
+          "texture_coords": true,
+          "transform": "position",
+
+          "vertex_shader": "opaque_vs",
+          "pixel_shader": "hardedged_ps"
+        }
+      ]
+    },
+
+    {
+      "name": "transparent hardedged",
+      "id": 1,
+
+      "passes": [
+        {
+          "skinned": false,
+          "lighting": false,
+          "vertex_color": true,
+          "texture_coords": true,
+          "transform": "position",
+
+          "vertex_shader": "transparent_vs",
+          "pixel_shader": "transparent_hardedged_ps"
+        }
+      ]
+    },
+
+    {
+      "name": "shadow hardedged",
+      "id": 2,
+
+      "passes": [
+        {
+          "skinned": false,
+          "lighting": false,
+          "vertex_color": true,
+          "texture_coords": true,
+          "transform": "position",
+
+          "vertex_shader": "opaque_vs",
+          "pixel_shader": "shadow_hardedged_ps"
+        }
+      ]
+    },
+
+    {
+      "name": "shadow transparent hardedged",
+      "id": 3,
+
+      "passes": [
+        {
+          "skinned": false,
+          "lighting": false,
+          "vertex_color": true,
+          "texture_coords": true,
+          "transform": "position",
+
+          "vertex_shader": "transparent_vs",
+          "pixel_shader": "shadow_transparent_hardedged_ps"
+        }
+      ]
+    }
+  ]
+}
