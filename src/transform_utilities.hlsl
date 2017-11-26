@@ -12,16 +12,38 @@ namespace transform
 namespace unskinned
 {
 
+//! \brief Decompress an unskinned vertex position.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices Ignored.
+//! \param weights Ignored.
+//!
+//! \return The object space position of the vertex.
 float4 position(float4 position, uint4 indices, float4 weights)
 {
    return decompress_position(position);
 }
 
-float3 normals(float3 normals, uint4 indices, float4 weights)
+//! \brief Decompress an unskinned vertex normal.
+//!
+//! \param normal The (potentially compressed) vertex normal.
+//! \param indices Ignored.
+//! \param weights Ignored.
+//!
+//! \return The object space normal of the vertex.
+float3 normals(float3 normal, uint4 indices, float4 weights)
 {
-   return decompress_normals(normals);
+   return decompress_normals(normal);
 }
 
+//! \brief Decompress unskinned vertex binormals.
+//!
+//! \param binormal The (potentially compressed) vertex binormal.
+//! \param tangent The (potentially compressed) vertex tangent.
+//! \param indices Ignored.
+//! \param weights Ignored.
+//!
+//! \return The object space binormals of the vertex.
 Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weights)
 {
    return decompress_binormals(binormal, tangent);
@@ -32,6 +54,11 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weigh
 namespace soft_skinned
 {
 
+//! \brief Gets the transformation matrix for a bone
+//!
+//! \param index The index of the bone.
+//!
+//! \return The transformation matrix of the bone.
 float3x4 get_bone_matrix(int index)
 {
    float3x4 mat;
@@ -43,6 +70,14 @@ float3x4 get_bone_matrix(int index)
    return mat;
 }
 
+//! \brief Calculate combined transformation matrix for 
+//! a soft skinned vertex.
+//!
+//! \param index The index of the bone.
+//! \param weights The vertex weights.
+//! \param vertex_indices The (potentially compressed) vertex blend indices.
+//!
+//! \return The soft skin transformation matrix of the vertex.
 float3x4 calculate_skin(float4 weights, uint4 vertex_indices)
 {
    int3 indices = vertex_indices.xyz * constant_1.www;
@@ -60,6 +95,14 @@ float3x4 calculate_skin(float4 weights, uint4 vertex_indices)
    return skin;
 }
 
+//! \brief Decompress and transform a skinned vertex position to object
+//! space.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space position of the vertex.
 float4 position(float4 position, uint4 indices, float4 weights)
 {
    position = decompress_position(position);
@@ -69,17 +112,34 @@ float4 position(float4 position, uint4 indices, float4 weights)
    return float4(mul(skin, position), constant_0.z);
 }
 
-float3 normals(float3 normals, uint4 indices, float4 weights)
+//! \brief Decompress and transform a skinned vertex normal to object
+//! space.
+//!
+//! \param normal The (potentially compressed) vertex normal.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space normal of the vertex.
+float3 normals(float3 normal, uint4 indices, float4 weights)
 {
-   normals = decompress_normals(normals);
+   normal = decompress_normals(normal);
    
    float3x4 skin = calculate_skin(weights, indices);
 
-   float3 obj_normal = mul(skin, normals);
+   float3 obj_normal = mul(skin, normal);
 
    return normalize(obj_normal);
 }
 
+//! \brief Decompress and transform skinned vertex binormals to object
+//! space.
+//!
+//! \param binormal The (potentially compressed) vertex binormal.
+//! \param tangent The (potentially compressed) vertex tangent.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space binormals of the vertex.
 Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weights)
 {
    Binormals binormals = decompress_binormals(binormal, tangent);
@@ -102,6 +162,13 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weigh
 namespace hard_skinned
 {
 
+//! \brief Decompress and transform a hard skinned vertex position 
+//! to object space. Provided for the stencilshadow shader.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices The (potentially compressed) vertex blend indices.
+//!
+//! \return The object space position of the vertex.
 float4 position(float4 position, uint4 indices)
 {
    int index = indices.x * constant_1.w;
@@ -113,6 +180,13 @@ float4 position(float4 position, uint4 indices)
    return float4(mul(skin, position), constant_0.z);
 }
 
+//! \brief Decompress and transform a hard skinned vertex normal 
+//! to object space. Provided for the stencilshadow shader.
+//!
+//! \param normal The (potentially compressed) vertex normal.
+//! \param indices The (potentially compressed) vertex blend indices.
+//!
+//! \return The object space normal of the vertex.
 float3 normals(float3 normals, uint4 indices)
 {
    int index = indices.x * constant_1.w;
@@ -126,6 +200,14 @@ float3 normals(float3 normals, uint4 indices)
    return normalize(obj_normal);
 }
 
+//! \brief Decompress and transform hard skinned vertex binormals
+//! to object space.
+//!
+//! \param binormal The (potentially compressed) vertex binormal
+//! \param tangent The (potentially compressed) vertex tangent.
+//! \param indices The (potentially compressed) vertex blend indices.
+//!
+//! \return The object space binormals of the vertex.
 Binormals binormals(float3 binormal, float3 tangent, uint4 indices)
 {
    int index = indices.x * constant_1.w;
@@ -157,6 +239,15 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices)
 #define skin_type_binormals unskinned::binormals
 #endif
 
+//! \brief Decompress and transform a skinned or unskinned vertex
+//! position; which operation is taken depends on if TRANSFORM_SOFT_SKINNED 
+//! is defined or not.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The world space position of the vertex.
 float4 position(float4 position, uint4 indices, float4 weights)
 {
    float4 obj_position = skin_type_position(position, indices, weights);
@@ -164,21 +255,58 @@ float4 position(float4 position, uint4 indices, float4 weights)
    return position_to_world(obj_position);
 }
 
+//! \brief Decompress and transform a skinned or unskinned vertex
+//! position; which operation is taken depends on if TRANSFORM_SOFT_SKINNED 
+//! is defined or not.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space position of the vertex.
 float4 position_obj(float4 position, uint4 indices, float4 weights)
 {
    return skin_type_position(position, indices, weights);
 }
 
+//! \brief Decompress, transform and project a skinned or unskinned vertex
+//! position; which operation is taken depends on if TRANSFORM_SOFT_SKINNED 
+//! is defined or not.
+//!
+//! \param position The (potentially compressed) vertex position.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The projection space position of the vertex.
 float4 position_project(float4 world_position, uint4 indices, float4 weights)
 {
    return ::position_project(position(world_position, indices, weights));
 }
 
-float3 normals(float3 normals, uint4 indices, float4 weights)
+//! \brief Decompress and transform a skinned or unskinned vertex
+//! normal to object space; which operation is taken depends on
+//! if TRANSFORM_SOFT_SKINNED is defined or not.
+//!
+//! \param normal The (potentially compressed) vertex normal.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space normal of the vertex.
+float3 normals(float3 normal, uint4 indices, float4 weights)
 {
-   return skin_type_normals(normals, indices, weights);
+   return skin_type_normals(normal, indices, weights);
 }
 
+//! \brief Decompress and transform a skinned or unskinned vertex's
+//! binormals to object space; which operation is taken depends on
+//! if TRANSFORM_SOFT_SKINNED is defined or not.
+//!
+//! \param binormal The (potentially compressed) vertex binormal.
+//! \param tangent The (potentially compressed) vertex tangent.
+//! \param indices The (potentially compressed) vertex blend indices.
+//! \param weights The vertex weights.
+//!
+//! \return The object space binormals of the vertex.
 Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weights)
 {
    return skin_type_binormals(binormal, tangent, indices, weights);
@@ -188,16 +316,24 @@ Binormals binormals(float3 binormal, float3 tangent, uint4 indices, float4 weigh
 #undef skin_type_normals
 #undef skin_type_binormals
 
-// decompress and transform an unskinned vertex to it's world position
+//! \brief Decompress and transform an unskinned vertex.
+//!
+//! \param position The (potentially compressed) vertex position.
+//!
+//! \return The world space position of the vertex.
 float4 position(float4 position)
 {
    return position_to_world(decompress_position(position));
 }
 
-// decompress, transform an unskinned vertex to it's world position and project it
-float4 position_project(float4 world_position)
+//! \brief Decompress, transform and project an unskinned vertex.
+//!
+//! \param position The (potentially compressed) vertex position.
+//!
+//! \return The projection space position of the vertex.
+float4 position_project(float4 position)
 {
-   return ::position_project(position(world_position));
+   return ::position_project(transform::position(position));
 }
 
 }
