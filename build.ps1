@@ -52,4 +52,4 @@ foreach ($file in Get-ChildItem -File -Path definitions\* -Include *.json)
    ./build/bin/compiler $file.FullName "src\$srcname" "build\munged\$outname"
 }
 
-levelpack -inputfile "build/core.req" -sourcedir "build/premunged/" "build/munged/"
+levelpack -inputfile "build/core.req" -sourcedir "build/munged/" "build/premunged/"
