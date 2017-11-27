@@ -79,17 +79,16 @@ struct Vs_blinn_phong_ouput
    float3 world_position : TEXCOORD1;
    float3 normal : TEXCOORD2;
 
-   float4 light_position_0 : TEXCOORD3;
-   float4 light_position_1 : TEXCOORD4;
-   float4 light_position_2 : TEXCOORD5;
+   float4 light_position[3] : TEXCOORD3;
 
    float1 specular_power : TEXCOORD6;
 
    float3 envmap_coords : TEXCOORD7;
+   bool envmapped : TEXCOORD8;
 };
 
 Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
-                                    uniform float4 specular_power : register(vs, c[CUSTOM_CONST_MIN + 2]),
+                                    uniform float4 specular_state : register(vs, c[CUSTOM_CONST_MIN + 2]),
                                     uniform float4 light_positions[3] : register(vs, c[CUSTOM_CONST_MIN + 3]))
 {
    Vs_blinn_phong_ouput output;
@@ -111,19 +110,20 @@ Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
 
    output.normal = world_normal;
 
-   output.light_position_0 = light_positions[0];
-   output.light_position_1 = light_positions[1];
-   output.light_position_2 = light_positions[2];
+   for (int i = 0; i < 3; ++i) {
+      output.light_position[i] = light_positions[i];
 
-   // get the squared light radius for each light if they are point lights
-   if (light_positions[0].w != 0.0) output.light_position_0.w = (1.0 / light_positions[0].w);
-   if (light_positions[1].w != 0.0) output.light_position_1.w = (1.0 / light_positions[1].w);
-   if (light_positions[2].w != 0.0) output.light_position_2.w = (1.0 / light_positions[2].w);
-
-   output.specular_power = specular_power.w;
+      // get the squared light radius the light if it's a point light
+      if (light_positions[i].w != 0.0) {
+         output.light_position[i].w = (1.0 / light_positions[i].w);
+      }
+   }
+   
+   output.specular_power = specular_state.w;
 
    float3 camera_direction = normalize(world_view_position.xyz - world_position.xyz);
    output.envmap_coords = normalize(reflect(world_normal, camera_direction));
+   output.envmapped = (specular_state[0] == 1.0);
 
    return output;
 }
@@ -240,19 +240,17 @@ struct Ps_blinn_phong_input
    float3 world_position : TEXCOORD1;
    float3 normal : TEXCOORD2;
 
-   float4 light_position_0 : TEXCOORD3;
-   float4 light_position_1 : TEXCOORD4;
-   float4 light_position_2 : TEXCOORD5;
+   float4 light_position[3] : TEXCOORD3;
 
    float1 specular_power : TEXCOORD6;
 
    float3 envmap_coords : TEXCOORD7;
+   bool envmapped : TEXCOORD8;
 };
 
-void calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_position,
-                           float4 light_position, float3 light_color, 
-                           float3 specular_color, float specular_power, float gloss,
-                           inout float3 diffuse_out, inout float3 specular_out)
+float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_position,
+                             float4 light_position, float3 light_color, 
+                             float3 specular_color, float specular_power, float gloss)
 {
    float3 light_direction = normalize(light_position.xyz - world_position);
 
@@ -273,13 +271,12 @@ void calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_posit
 
    float3 blended_specular_color = saturate((specular_color + light_color) / 2);
 
-   diffuse_out += attenuation * light_color;
-   specular_out += attenuation * (blended_specular_color * specular);
+   return attenuation * (blended_specular_color * specular);
 }
 
 float4 blinn_phong_ps(Ps_blinn_phong_input input, sampler2D diffuse_map,
                       samplerCUBE envmap, float4 specular_color, float3 light_colors[3],
-                      const uint light_count)
+                      const int light_count)
 {
    float diffuse_alpha = tex2D(diffuse_map, input.texcoords).a;
    float gloss = lerp(1.0, diffuse_alpha, specular_color.a);
@@ -287,33 +284,28 @@ float4 blinn_phong_ps(Ps_blinn_phong_input input, sampler2D diffuse_map,
    float3 normal = normalize(input.normal);
    float3 view_normal = normalize(-input.world_position);
 
-   float3 diffuse_color = float3(0.0, 0.0, 0.0);
    float3 spec_color = float3(0.0, 0.0, 0.0);
 
-   if (light_count >= 1) {
-      calculate_blinn_phong(normal, view_normal, input.world_position, 
-                            input.light_position_0, light_colors[0], 
-                            specular_color.rgb, input.specular_power, gloss,
-                            diffuse_color, spec_color);
+   if (light_count >= 1 && !input.envmapped) {
+      spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
+                                          input.light_position[0], light_colors[0], 
+                                          specular_color.rgb, input.specular_power, gloss);
    }
+   
    if (light_count >= 2) {
-      calculate_blinn_phong(normal, view_normal, input.world_position,
-                            input.light_position_1, light_colors[1], 
-                            specular_color.rgb, input.specular_power, gloss,
-                            diffuse_color, spec_color);
+      spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
+                                          input.light_position[1], light_colors[1], 
+                                          specular_color.rgb, input.specular_power, gloss);
    }
+   
    if (light_count >= 3) {
-      calculate_blinn_phong(normal, view_normal, input.world_position,
-                            input.light_position_2, light_colors[2], 
-                            specular_color.rgb, input.specular_power, gloss,
-                            diffuse_color, spec_color);
+      spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
+                                          input.light_position[2], light_colors[2], 
+                                          specular_color.rgb, input.specular_power, gloss);
    }
 
-   float3 envmap_color = texCUBE(envmap, input.envmap_coords).rgb;
-
-   float3 reflection = (envmap_color * envmap_color);
-
-   float3 color = saturate(gloss * ((diffuse_color * envmap_color) + spec_color));
+   float3 envmap_color = texCUBE(envmap, input.envmap_coords).rgb * specular_color.rgb;
+   float3 color = saturate(gloss * (envmap_color + spec_color));
 
    return float4(color, diffuse_alpha);
 }
