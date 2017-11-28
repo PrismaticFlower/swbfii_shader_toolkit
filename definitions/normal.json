@@ -15,7 +15,10 @@
           "transform": "position",
 
           "vertex_shader": "unlit_opaque_vs",
-          "pixel_shader": "unlit_opaque_ps"
+          "pixel_shader": "unlit_opaque_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -33,7 +36,10 @@
           "transform": "position",
 
           "vertex_shader": "unlit_opaque_vs",
-          "pixel_shader": "unlit_opaque_hardedged_ps"
+          "pixel_shader": "unlit_opaque_hardedged_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -51,7 +57,10 @@
           "transform": "position",
 
           "vertex_shader": "unlit_transparent_vs",
-          "pixel_shader": "unlit_transparent_ps"
+          "pixel_shader": "unlit_transparent_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -69,7 +78,10 @@
           "transform": "position",
 
           "vertex_shader": "unlit_transparent_vs",
-          "pixel_shader": "unlit_transparent_hardedged_ps"
+          "pixel_shader": "unlit_transparent_hardedged_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -87,7 +99,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_vs",
-          "pixel_shader": "near_opaque_ps"
+          "pixel_shader": "near_opaque_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -105,7 +120,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_vs",
-          "pixel_shader": "near_opaque_hardedged_ps"
+          "pixel_shader": "near_opaque_hardedged_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -123,7 +141,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_ps"
+          "pixel_shader": "near_transparent_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -141,7 +162,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_hardedged_ps"
+          "pixel_shader": "near_transparent_hardedged_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -159,7 +183,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_projectedtex_ps"
+          "pixel_shader": "near_opaque_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -177,7 +204,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_hardedged_projectedtex_ps"
+          "pixel_shader": "near_opaque_hardedged_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -195,7 +225,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_projectedtex_ps"
+          "pixel_shader": "near_transparent_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -213,7 +246,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_hardedged_projectedtex_ps"
+          "pixel_shader": "near_transparent_hardedged_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -231,7 +267,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_shadow_ps"
+          "pixel_shader": "near_opaque_shadow_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -249,7 +288,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_hardedged_shadow_ps"
+          "pixel_shader": "near_opaque_hardedged_shadow_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -267,7 +309,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_shadow_projectedtex_ps"
+          "pixel_shader": "near_opaque_shadow_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -285,7 +330,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_opaque_shadow_projectedtex_vs",
-          "pixel_shader": "near_opaque_hardedged_shadow_projectedtex_ps"
+          "pixel_shader": "near_opaque_hardedged_shadow_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -303,7 +351,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_shadow_ps"
+          "pixel_shader": "near_transparent_shadow_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -321,7 +372,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_hardedged_shadow_ps"
+          "pixel_shader": "near_transparent_hardedged_shadow_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -339,7 +393,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_shadow_projectedtex_ps"
+          "pixel_shader": "near_transparent_shadow_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -357,7 +414,10 @@
           "transform": "normals",
 
           "vertex_shader": "near_transparent_shadow_projectedtex_vs",
-          "pixel_shader": "near_transparent_shadow_projectedtex_ps"
+          "pixel_shader": "near_transparent_shadow_projectedtex_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     }

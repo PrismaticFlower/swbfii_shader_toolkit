@@ -15,7 +15,10 @@
           "transform": "normals",
 
           "vertex_shader": "diffuse_blendmap_vs",
-          "pixel_shader": "diffuse_blendmap_ps"
+          "pixel_shader": "diffuse_blendmap_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     },
@@ -33,7 +36,10 @@
           "transform": "normals",
 
           "vertex_shader": "diffuse_blendmap_vs",
-          "pixel_shader": "diffuse_blendmap_ps"
+          "pixel_shader": "diffuse_blendmap_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         },
 
         {
@@ -44,7 +50,10 @@
           "transform": "normals",
 
           "vertex_shader": "detailing_vs",
-          "pixel_shader": "detailing_ps"
+          "pixel_shader": "detailing_ps",
+
+          "vs_target": "vs_2_0",
+          "ps_target": "ps_2_0"
         }
       ]
     }
