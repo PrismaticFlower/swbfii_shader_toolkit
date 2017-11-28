@@ -132,12 +132,11 @@ struct Vs_normalmapped_envmap_ouput
    float1 fog : FOG;
 
    float2 texcoords : TEXCOORD0;
-   float3 envmap_coords : TEXCOORD1;
-   float3 normal : TEXCOORD2;
-   float3 binormal : TEXCOORD3;
-   float3 tangent : TEXCOORD4;
-   float3 world_position : TEXCOORD5;
-   float3 world_view_position : TEXCOORD6;
+   float3 normal : TEXCOORD1;
+   float3 binormal : TEXCOORD2;
+   float3 tangent : TEXCOORD3;
+   float3 world_position : TEXCOORD4;
+   float3 world_view_position : TEXCOORD5;
 };
 
 Vs_normalmapped_envmap_ouput normalmapped_envmap_vs(Vs_input input)
@@ -169,9 +168,6 @@ Vs_normalmapped_envmap_ouput normalmapped_envmap_vs(Vs_input input)
    output.binormal = world_binormals.s;
    output.tangent = world_binormals.t;
 
-   float3 camera_direction = normalize(world_view_position.xyz - world_position.xyz);
-   output.envmap_coords = normalize(reflect(world_normal, camera_direction));
-
    return output;
 }
 
@@ -195,8 +191,7 @@ float4 normalmapped_ps(Ps_normalmapped_input input,
 {
    float4 normal_map_color = tex2D(normal_map, input.texcoords);
 
-   // calculate texel normal
-   float3 texel_normal = normal_map_color.rgb - float3(0.5, 0.5, 0.5);
+   float3 texel_normal = normal_map_color.rgb * 2.0 - 1.0;
 
    texel_normal = normalize(texel_normal.x * input.tangent -
                             texel_normal.y * input.binormal +
@@ -335,13 +330,11 @@ float4 blinn_phong_lights_1_ps(Ps_blinn_phong_input input,
 struct Ps_normalmapped_envmap_input
 {
    float2 texcoords : TEXCOORD0;
-   float3 envmap_coords : TEXCOORD1;
-
-   float3 normal : TEXCOORD2;
-   float3 binormal : TEXCOORD3;
-   float3 tangent : TEXCOORD4;
-   float3 world_position : TEXCOORD5;
-   float3 world_view_position : TEXCOORD6;
+   float3 normal : TEXCOORD1;
+   float3 binormal : TEXCOORD2;
+   float3 tangent : TEXCOORD3;
+   float3 world_position : TEXCOORD4;
+   float3 world_view_position : TEXCOORD5;
 };
 
 float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
@@ -351,21 +344,19 @@ float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
 {
    float4 normal_map_color = tex2D(normal_map, input.texcoords);
 
-   float3 texel_normal = normal_map_color.rgb - float3(0.5, 0.5, 0.5);
+   float3 texel_normal = normal_map_color.rgb * 2.0 - 1.0;
 
    texel_normal = normalize(texel_normal.x * input.tangent -
                             texel_normal.y * input.binormal +
                             texel_normal.z * input.normal);
 
-   float3 view_dir = normalize(-input.world_position);
-
-   float difference = saturate(dot(view_dir, texel_normal));
+   float3 camera_direction = normalize(input.world_view_position - input.world_position);
+   float3 envmap_coords = normalize(reflect(texel_normal, camera_direction));
+   float3 envmap_color = texCUBE(envmap, envmap_coords).rgb;
 
    float gloss = lerp(1.0, normal_map_color.a, specular_color.a);
 
-   float3 envmap_color = texCUBE(envmap, input.envmap_coords).rgb;
-
-   float3 color = envmap_color * light_color * gloss * difference;
+   float3 color = gloss * light_color * specular_color.rgb * envmap_color;
 
    return float4(color, normal_map_color.a);
 }
