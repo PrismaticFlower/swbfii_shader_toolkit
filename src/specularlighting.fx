@@ -29,7 +29,8 @@ struct Vs_normalmapped_ouput
    float3 tangent : TEXCOORD3;
 
    float3 world_position : TEXCOORD4;
-   float4 light_position : TEXCOORD5;
+   float3 world_view_position : TEXCOORD5;
+   float4 light_position : TEXCOORD6;
 };
 
 Vs_normalmapped_ouput normalmapped_vs(Vs_input input,
@@ -41,6 +42,7 @@ Vs_normalmapped_ouput normalmapped_vs(Vs_input input,
                                                input.weights);
 
    output.world_position = world_position.xyz;
+   output.world_view_position = world_view_position.xyz;
    output.position = position_project(world_position);
    output.fog = calculate_fog(world_position);
 
@@ -72,16 +74,14 @@ Vs_normalmapped_ouput normalmapped_vs(Vs_input input,
 struct Vs_blinn_phong_ouput
 {
    float4 position : POSITION;
-   float1 fog : FOG;
 
    float2 texcoords : TEXCOORD0;
 
    float3 world_position : TEXCOORD1;
-   float3 normal : TEXCOORD2;
+   float3 world_view_position : TEXCOORD2;
+   float3 normal : TEXCOORD3;
 
-   float4 light_position[3] : TEXCOORD3;
-
-   float1 specular_power : TEXCOORD6;
+   float4 light_position[3] : TEXCOORD4;
 
    float3 envmap_coords : TEXCOORD7;
    bool envmapped : TEXCOORD8;
@@ -97,8 +97,8 @@ Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
                                                input.weights);
 
    output.world_position = world_position.xyz;
+   output.world_view_position = world_view_position.xyz;
    output.position = position_project(world_position);
-   output.fog = calculate_fog(world_position);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -118,8 +118,6 @@ Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
          output.light_position[i].w = (1.0 / light_positions[i].w);
       }
    }
-   
-   output.specular_power = specular_state.w;
 
    float3 camera_direction = normalize(world_view_position.xyz - world_position.xyz);
    output.envmap_coords = normalize(reflect(world_normal, camera_direction));
@@ -184,9 +182,10 @@ struct Ps_normalmapped_input
    float3 binormal : TEXCOORD2;
    float3 tangent : TEXCOORD3;
    float3 world_position : TEXCOORD4;
+   float3 world_view_position : TEXCOORD5;
 
    // squared light radius in w or w = 0 if directional light
-   float4 light_position : TEXCOORD5;
+   float4 light_position : TEXCOORD6;
 };
 
 float4 normalmapped_ps(Ps_normalmapped_input input,
@@ -220,9 +219,9 @@ float4 normalmapped_ps(Ps_normalmapped_input input,
 
    light_normal = normalize(light_normal);
 
-   float3 view_normal = normalize(-input.world_position);
+   float3 view_normal = normalize(input.world_view_position - input.world_position);
 
-   float specular = saturate(dot(normalize(light_normal - view_normal), texel_normal));
+   float specular = saturate(dot(normalize(light_normal + view_normal), texel_normal));
    specular = pow(specular, 128);
 
    float gloss = lerp(1.0, normal_map_color.a, specular_color.a);
@@ -238,11 +237,10 @@ struct Ps_blinn_phong_input
    float2 texcoords : TEXCOORD0;
 
    float3 world_position : TEXCOORD1;
-   float3 normal : TEXCOORD2;
+   float3 world_view_position : TEXCOORD2;
+   float3 normal : TEXCOORD3;
 
-   float4 light_position[3] : TEXCOORD3;
-
-   float1 specular_power : TEXCOORD6;
+   float4 light_position[3] : TEXCOORD4;
 
    float3 envmap_coords : TEXCOORD7;
    bool envmapped : TEXCOORD8;
@@ -250,7 +248,7 @@ struct Ps_blinn_phong_input
 
 float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_position,
                              float4 light_position, float3 light_color, 
-                             float3 specular_color, float specular_power, float gloss)
+                             float3 specular_color, float gloss)
 {
    float3 light_direction = normalize(light_position.xyz - world_position);
 
@@ -267,7 +265,7 @@ float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_pos
 
    float3 half_vector = normalize(light_direction + view_normal);
    float specular_angle = max(dot(half_vector, normal), 0.0);
-   float specular = pow(specular_angle, 18.86 * specular_power);
+   float specular = pow(specular_angle, 16.0);
 
    float3 blended_specular_color = saturate((specular_color + light_color) / 2);
 
@@ -282,26 +280,26 @@ float4 blinn_phong_ps(Ps_blinn_phong_input input, sampler2D diffuse_map,
    float gloss = lerp(1.0, diffuse_alpha, specular_color.a);
 
    float3 normal = normalize(input.normal);
-   float3 view_normal = normalize(-input.world_position);
+   float3 view_normal = normalize(input.world_view_position - input.world_position);
 
    float3 spec_color = float3(0.0, 0.0, 0.0);
 
    if (light_count >= 1 && !input.envmapped) {
       spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
                                           input.light_position[0], light_colors[0], 
-                                          specular_color.rgb, input.specular_power, gloss);
+                                          specular_color.rgb, gloss);
    }
    
    if (light_count >= 2) {
       spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
                                           input.light_position[1], light_colors[1], 
-                                          specular_color.rgb, input.specular_power, gloss);
+                                          specular_color.rgb, gloss);
    }
    
    if (light_count >= 3) {
       spec_color += calculate_blinn_phong(normal, view_normal, input.world_position,
                                           input.light_position[2], light_colors[2], 
-                                          specular_color.rgb, input.specular_power, gloss);
+                                          specular_color.rgb, gloss);
    }
 
    float3 envmap_color = texCUBE(envmap, input.envmap_coords).rgb * specular_color.rgb;
