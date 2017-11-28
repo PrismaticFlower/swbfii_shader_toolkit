@@ -280,36 +280,6 @@ float4 light_colors[3] : register(ps, c[0]);
 
 sampler2D normal_map : register(ps, s[0]);
 
-float3 calculate_light_normalmap(float3 world_position, float3 texel_normal,
-                                 float3 world_normal, float4 light_position,
-                                 float4 light_color)
-{
-   float3 light_direction;
-   float attenuation;
-   
-   if (light_position.w == 0) {
-      light_direction =  -light_position.xyz;
-      attenuation = saturate(dot(world_normal, light_direction));
-   }
-   else {
-      light_direction = light_position.xyz - world_position;
-
-      float distance = length(light_direction);
-
-      light_direction = normalize(light_direction);
-
-      float radius = light_position.w;
-
-      attenuation = 1.0 - distance * distance / (radius * radius);
-      attenuation = saturate(attenuation);
-      attenuation *= attenuation;
-   }
-
-   float difference = saturate(dot(light_direction, texel_normal));
-
-   return attenuation * (light_color.rgb * difference);
-}
-
 float3 calculate_light(float3 world_position, float3 world_normal, float4 light_position,
                        float4 light_color)
 {
@@ -318,7 +288,7 @@ float3 calculate_light(float3 world_position, float3 world_normal, float4 light_
 
    if (light_position.w == 0) {
       light_direction = -light_position.xyz;
-      attenuation = saturate(dot(world_normal, light_direction));
+      attenuation = 1.0;
    }
    else {
       light_direction = light_position.xyz - world_position;
@@ -333,13 +303,15 @@ float3 calculate_light(float3 world_position, float3 world_normal, float4 light_
       attenuation = saturate(attenuation);
       attenuation *= attenuation;
    }
+
+   float intensity = max(dot(world_normal, light_direction), 0.0);
    
-   return attenuation * light_color.rgb;
+   return attenuation * (intensity * light_color.rgb);
 }
 
 float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
 {
-   float3 texel_normal = tex2D(normal_map, input.texcoords).rgb - float3(0.5, 0.5, 0.5);
+   float3 texel_normal = tex2D(normal_map, input.texcoords).rgb * 2.0 - 1.0;
 
    texel_normal = normalize(texel_normal.x * input.tangent -
                             texel_normal.y * input.binormal +
@@ -348,18 +320,15 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
    float3 color = input.ambient_color;
 
    if (light_count >= 1) {
-      color += calculate_light_normalmap(input.world_position, texel_normal,
-                                         input.normal, input.light_position_0, 
+      color += calculate_light(input.world_position, texel_normal, input.light_position_0,
                                          light_colors[0]);
    }
    if (light_count >= 2) {
-      color += calculate_light_normalmap(input.world_position, texel_normal,
-                                         input.normal, input.light_position_1, 
+      color += calculate_light(input.world_position, texel_normal, input.light_position_1,
                                          light_colors[1]);
    }
    if (light_count >= 3) {
-      color += calculate_light_normalmap(input.world_position, texel_normal,
-                                         input.normal, input.light_position_2,
+      color += calculate_light(input.world_position, texel_normal, input.light_position_2,
                                          light_colors[2]);
    }
 
@@ -443,30 +412,12 @@ struct Ps_spotlight_input
    float4 projection_coords : TEXCOORD7;
 };
 
-float3 calculate_spotlight_normalmap(float3 world_position, float3 texel_normal,
-                                     float3 world_normal, float4 light_position,
-                                     float3 light_direction, float4 light_color,
-                                     float3 projection_color)
-{
-   float3 light_normal = normalize(light_position.xyz - world_position);
-
-   float light_distance = distance(world_position, light_position.xyz);
-   float range = light_position.w;
-
-   float attenuation = dot(light_direction, -light_normal);
-   attenuation -= light_distance * light_distance / (range * range);
-   attenuation = saturate(attenuation);
-
-   float difference = saturate(dot(light_normal, texel_normal));
-
-   return attenuation * (projection_color * (light_color.rgb * difference));
-}
-
 float3 calculate_spotlight(float3 world_position, float3 world_normal, 
                            float4 light_position, float3 light_direction,
                            float4 light_color, float3 projection_color)
 {
    float3 light_normal = normalize(light_position.xyz - world_position);
+   float intensity = max(dot(world_normal, light_normal), 0.0);
 
    float light_distance = distance(world_position, light_position.xyz);
    float range = light_position.w;
@@ -480,7 +431,7 @@ float3 calculate_spotlight(float3 world_position, float3 world_normal,
 
 float4 spotlight_normalmap_ps(Ps_spotlight_input input) : COLOR
 {
-   float3 texel_normal = tex2D(normal_map, input.texcoords).rgb - float3(0.5, 0.5, 0.5);
+   float3 texel_normal = tex2D(normal_map, input.texcoords).rgb * 2.0 - 1.0;
 
    texel_normal = normalize(texel_normal.x * input.tangent -
                             texel_normal.y * input.binormal +
@@ -490,10 +441,8 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input) : COLOR
 
    float3 color = input.ambient_color;
 
-   color += calculate_spotlight_normalmap(input.world_position, texel_normal,
-                                          input.normal, input.light_position,
-                                          input.light_direction, light_colors[0],
-                                          projection_color);
+   color += calculate_spotlight(input.world_position, texel_normal, input.light_position,
+                                input.light_direction, light_colors[0], projection_color);
    color = saturate(color);
 
    return float4(color, 1.0);
