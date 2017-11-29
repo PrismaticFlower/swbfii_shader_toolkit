@@ -1,24 +1,17 @@
 # swbfii_shader_toolkit
-A (mostly) toolkit targetting Star Wars Battlefront II (2005) and it's modtools. 
-Enables the creation and development of shaders for the game in HLSL.
+A (mostly complete) toolkit targetting Star Wars Battlefront II (2005) and it's modtools. Enables the creation and development of shaders for the game in HLSL.
 
 See the documentation folder for information about it's internal workings, structure and how to bootstrap the tool.
 
-### Shortcomings
+### Getting Started
+If you have a ready-to-go version of the toolkit you can skip this step. See [here](https://github.com/SleepKiller/swbfii_shader_toolkit/blob/master/documentation/bootstrapping.md) for instructions on how to get the toolkit working from the repo.
 
-#### No Support for Projected Cubemaps
-Due to the way Shader Models 2.0+ work a sampler slot can not be treated as having a runtime texture type. 
-(Well as far as I know. Please correct me if I'm wrong!) As a result we must choose a texture type to use
-and stick with in sampler slots. For the projected texture slot the shaders are setup to use 2D textures only. 
-However the perpixel shader does contain logic to prevent a pixel from going black as a result of failed texture lookups.
+Once you've done that you can run [build.ps1](https://github.com/SleepKiller/swbfii_shader_toolkit/blob/master/build.ps1) or [build.bat](https://github.com/SleepKiller/swbfii_shader_toolkit/blob/master/build.bat) to produce a core.lvl using the shaders contained in the toolkit. It'll be placed in this directory.
 
-#### No Water Shader Implementation
-(Yet.) There are two main reasons for this the first is that honestly I lack the skill to make a good replacement for 
-Pandemic's water shader and the second is that I didn't really feel like just rewriting their's in HLSL once I got to it. 
-(It was the last shader I got to.)
+After that you'll probably want to edit the shaders which you can find in the [src](https://github.com/SleepKiller/swbfii_shader_toolkit/tree/master/src) folder. And if you want to get really fancy you can even edit the shader definitions to mess around with adding multiple shader passes and such. You can find them in the [definitions](https://github.com/SleepKiller/swbfii_shader_toolkit/tree/master/definitions) folder and you can find documentation for them [here](https://github.com/SleepKiller/swbfii_shader_toolkit/blob/master/documentation/definitions.md).
 
-As a result both `normalmapadder` and `water` have no implementations present in the toolkit.
+Be sure to quickly look over the known [issues](https://github.com/SleepKiller/swbfii_shader_toolkit/issues) as well, so you're aware of the toolkit's shortcomings and workarounds for them. 
 
-#### Likely other things...
+### Spotted a Problem?
 I'm not a graphics programmer and I barely understand the math behind 3D rendering. As a result I am almost certain there
-are mistakes present in the shaders. (I know of a couple outstanding bugs/problems myself that I haven't fixed yet.) 
+are mistakes present in the shaders. If you happen to be lucky and spot one feel free to tell me about [it](https://github.com/SleepKiller/swbfii_shader_toolkit/issues/new).
