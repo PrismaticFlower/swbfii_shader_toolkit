@@ -5,7 +5,7 @@ metadata for the game. These files have been replaced with (for implementation s
 the entry points for a shader and it's accompanying metadata.
 
 ### Annotated Example File
-```json
+```js
 // JSON files can not actually have comments. Do not try to put any in a real definition.
 {
   // This sets the render type of the shader. The game will use this when loading the shader
