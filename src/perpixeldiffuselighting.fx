@@ -4,6 +4,9 @@
 #include "transform_utilities.hlsl"
 #include "lighting_utilities.hlsl"
 
+// Disbale single loop iteration warning.
+#pragma warning(disable : 3557)
+
 float4 texture_transforms[2] : register(vs, c[CUSTOM_CONST_MIN]);
 
 float4 light_constants[7] : register(vs, c[21]);
@@ -77,8 +80,9 @@ struct Vs_input
 struct Vs_3lights_output
 {
    float4 position : POSITION;
-   float1 fog : FOG;
+
    float3 ambient_color : COLOR;
+
    float2 texcoords : TEXCOORD0;
 
    float3 normal : TEXCOORD1;
@@ -87,9 +91,7 @@ struct Vs_3lights_output
 
    float3 world_position : TEXCOORD4;
 
-   float4 light_position_0 : TEXCOORD5;
-   float4 light_position_1 : TEXCOORD6;
-   float4 light_position_2 : TEXCOORD7;
+   float4 light_positions[3] : TEXCOORD5;
 };
 
 Vs_3lights_output lights_3_vs(Vs_input input)
@@ -101,7 +103,6 @@ Vs_3lights_output lights_3_vs(Vs_input input)
 
    output.world_position = world_position.xyz;
    output.position = position_project(world_position);
-   output.fog = calculate_fog(world_position);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -126,14 +127,13 @@ Vs_3lights_output lights_3_vs(Vs_input input)
    ambient_light += static_diffuse_color.rgb;
    output.ambient_color = ambient_light * light_ambient_color_top.a;
 
-   output.light_position_0.xyz = get_light_position(0).xyz;
-   output.light_position_0.w = get_light_radius(get_light_params(0));
+   for (int i = 0; i < 3; ++i) {
+      output.light_positions[i].xyz = get_light_position(i).xyz;
 
-   output.light_position_1.xyz = get_light_position(1).xyz;
-   output.light_position_1.w = get_light_radius(get_light_params(1));
+      const float4 light_params = get_light_params(i);
 
-   output.light_position_2.xyz = get_light_position(2).xyz;
-   output.light_position_2.w = get_light_radius(get_light_params(2));
+      output.light_positions[i].w = get_light_radius(light_params);
+   }
 
    return output;
 }
@@ -263,6 +263,7 @@ Vs_spotlight_output spotlight_genbinormals_terrain_vs(Vs_input input)
 struct Ps_3lights_input
 {
    float3 ambient_color : COLOR;
+
    float2 texcoords : TEXCOORD0;
 
    float3 normal : TEXCOORD1;
@@ -271,14 +272,10 @@ struct Ps_3lights_input
 
    float3 world_position : TEXCOORD4;
 
-   float4 light_position_0 : TEXCOORD5;
-   float4 light_position_1 : TEXCOORD6;
-   float4 light_position_2 : TEXCOORD7;
+   float4 light_positions[3] : TEXCOORD5;
 };
 
 float4 light_colors[3] : register(ps, c[0]);
-
-sampler2D normal_map : register(ps, s[0]);
 
 float3 calculate_light(float3 world_position, float3 world_normal, float4 light_position,
                        float4 light_color)
@@ -309,7 +306,8 @@ float3 calculate_light(float3 world_position, float3 world_normal, float4 light_
    return attenuation * (intensity * light_color.rgb);
 }
 
-float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
+float4 lights_normalmap_ps(Ps_3lights_input input, sampler2D normal_map,
+                           const int light_count)
 {
    float3 texel_normal = tex2D(normal_map, input.texcoords).rgb * 2.0 - 1.0;
 
@@ -319,17 +317,9 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
 
    float3 color = input.ambient_color;
 
-   if (light_count >= 1) {
-      color += calculate_light(input.world_position, texel_normal, input.light_position_0,
-                                         light_colors[0]);
-   }
-   if (light_count >= 2) {
-      color += calculate_light(input.world_position, texel_normal, input.light_position_1,
-                                         light_colors[1]);
-   }
-   if (light_count >= 3) {
-      color += calculate_light(input.world_position, texel_normal, input.light_position_2,
-                                         light_colors[2]);
+   for (int i = 0; i < light_count; ++i) {
+      color += calculate_light(input.world_position, texel_normal, 
+                               input.light_positions[i], light_colors[i]);
    }
 
    color = saturate(color);
@@ -337,41 +327,32 @@ float4 lights_normalmap_ps(Ps_3lights_input input, const uint light_count)
    return float4(color, 1.0);
 }
 
-float4 lights_3_normalmap_ps(Ps_3lights_input input) : COLOR
+float4 lights_3_normalmap_ps(Ps_3lights_input input,
+                             uniform sampler2D normal_map : register(ps, s[0])) : COLOR
 {
-   return lights_normalmap_ps(input, 3);
+   return lights_normalmap_ps(input, normal_map, 3);
 }
 
-float4 lights_2_normalmap_ps(Ps_3lights_input input) : COLOR
+float4 lights_2_normalmap_ps(Ps_3lights_input input,
+                             uniform sampler2D normal_map : register(ps, s[0])) : COLOR
 {
-   return lights_normalmap_ps(input, 2);
+   return lights_normalmap_ps(input, normal_map, 2);
 }
 
-float4 lights_1_normalmap_ps(Ps_3lights_input input) : COLOR
+float4 lights_1_normalmap_ps(Ps_3lights_input input,
+                             uniform sampler2D normal_map : register(ps, s[0])) : COLOR
 {
-   return lights_normalmap_ps(input, 1);
+   return lights_normalmap_ps(input, normal_map, 1);
 }
 
-float4 lights_ps(Ps_3lights_input input, const uint light_count)
+float4 lights_ps(Ps_3lights_input input, const int light_count)
 {
    float3 color = input.ambient_color;
 
-   // This code depends on the compilers dead code elimination
-   // in theory it should work all the time. If it doesn't
-   // then lights_*_ps will need to have this code
-   // hoisted out into it.
+   for (int i = 0; i < light_count; ++i) {
 
-   if (light_count >= 1) {
       color += calculate_light(input.world_position, input.normal, 
-                               input.light_position_0, light_colors[0]);
-   }
-   if (light_count >= 2) {
-      color += calculate_light(input.world_position, input.normal, 
-                               input.light_position_1, light_colors[1]);
-   }
-   if (light_count >= 3) {
-      color += calculate_light(input.world_position, input.normal, 
-                               input.light_position_2, light_colors[2]);
+                               input.light_positions[i], light_colors[i]);
    }
 
    color = saturate(color);
@@ -393,8 +374,6 @@ float4 lights_1_ps(Ps_3lights_input input) : COLOR
 {
    return lights_ps(input, 1);
 }
-
-sampler2D projection_map : register(ps, s[2]);
 
 struct Ps_spotlight_input
 {
@@ -429,7 +408,9 @@ float3 calculate_spotlight(float3 world_position, float3 world_normal,
    return attenuation * (projection_color * light_color.rgb);
 }
 
-float4 spotlight_normalmap_ps(Ps_spotlight_input input) : COLOR
+float4 spotlight_normalmap_ps(Ps_spotlight_input input,
+                              uniform sampler2D normal_map : register(ps, s[0]),
+                              uniform sampler2D projection_map : register(ps, s[2])) : COLOR
 {
    float3 texel_normal = tex2D(normal_map, input.texcoords).rgb * 2.0 - 1.0;
 
@@ -448,7 +429,8 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input) : COLOR
    return float4(color, 1.0);
 }
 
-float4 spotlight_ps(Ps_spotlight_input input) : COLOR
+float4 spotlight_ps(Ps_spotlight_input input,
+                    uniform sampler2D projection_map : register(ps, s[2])) : COLOR
 {
    float3 projection_color = tex2Dproj(projection_map, input.projection_coords).rgb;
 
