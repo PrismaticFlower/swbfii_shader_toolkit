@@ -182,7 +182,7 @@ float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_pos
                              float4 light_position, float3 light_color, 
                              float3 specular_color, float exponent)
 {
-   float3 light_direction = normalize(light_position.xyz - world_position);
+   float3 light_direction = light_position.xyz - world_position;
 
    float distance = length(light_direction);
 
@@ -192,8 +192,10 @@ float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_pos
 
    if (light_position.w == 0) {
       light_direction = light_position.xyz;
-      attenuation = max(dot(normal, light_direction), 0.0);
+      attenuation = 1.0;
    }
+
+   light_direction = normalize(light_direction);
 
    float3 half_vector = normalize(light_direction + view_normal);
    float specular_angle = max(dot(half_vector, normal), 0.0);
