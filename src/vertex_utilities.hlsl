@@ -108,13 +108,13 @@ float4 get_static_diffuse_color(float4 color)
 #ifdef USE_VERTEX_COLOR
    return color * color_state.xxxz + color_state.zzzz;
 #else
-   return constant_0.xxxx;
+   return 0.0;
 #endif
 }
 
 float4 position_to_world(float4 position)
 {
-   return float4(mul(position, world_matrix), constant_0.z);
+   return float4(mul(position, world_matrix), 1.0);
 }
 
 float4 position_project(float4 position)
@@ -160,7 +160,7 @@ float4 transform_shadowmap_coords(float4 world_position)
    coords.x = dot(world_position, shadow_map_transform[0]);
    coords.y = dot(world_position, shadow_map_transform[1]);
    coords.w = dot(world_position, shadow_map_transform[2]);
-   coords.z = constant_0.x;
+   coords.z = 0.0;
 
    return coords;
 }

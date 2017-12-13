@@ -15,7 +15,7 @@ namespace light
 
 float3 ambient(float3 world_normal)
 {
-   float factor = world_normal.y * -constant_0.y + constant_0.y;
+   float factor = world_normal.y * -0.5 + 0.5;
 
    float3 color;
 
@@ -32,7 +32,7 @@ float intensity_directional(float3 world_normal, float4 direction)
 {
    float intensity = dot(world_normal.xyz, -direction.xyz);
 
-   return max(intensity, constant_0.x);
+   return max(intensity, 0.0);
 }
 
 float intensity_point(float3 world_normal, float4 world_position, float4 light_position)
@@ -47,10 +47,10 @@ float intensity_point(float3 world_normal, float4 world_position, float4 light_p
 
    const float inv_range_sq = light_position.w;
 
-   intensity.x = constant_0.z;
+   intensity.x = 1.0;
    intensity.z = -dir_dot * inv_range_sq + intensity.x;
    intensity.y = dot(world_normal.xyz, -light_dir);
-   intensity = max(intensity, constant_0.xxx);
+   intensity = max(intensity, 0.0);
 
    return intensity.y * intensity.z;
 }
@@ -72,18 +72,18 @@ float intensity_spot(float3 world_normal, float4 world_position)
    float4 attenuation;
 
    attenuation = dot(light_dir, light_spot_dir.xyz);
-   attenuation.x = (dir_rsqr < constant_0.x) ? 1.0f : 0.0f;
-   attenuation.y = constant_0.z;
+   attenuation.x = (dir_rsqr < 0.0) ? 1.0f : 0.0f;
+   attenuation.y = 1.0;
    attenuation.x = bidirectional * -attenuation.x + attenuation.y;
    attenuation.w = attenuation.w * attenuation.x;
 
    // compute distance attenuation
    attenuation.z = -dir_dot * inv_range_sq + attenuation.y;
-   attenuation = max(attenuation, constant_0.xxxx);
+   attenuation = max(attenuation, 0.0);
 
    // set if inside the inner/outer cone
    attenuation.y = (attenuation.w >= light_spot_params.x) ? 1.0f : 0.0f;
-   attenuation.x = (attenuation.w < constant_0.x) ? 1.0f : 0.0f;
+   attenuation.x = (attenuation.w <  0.0) ? 1.0f : 0.0f;
    attenuation.z *= attenuation.y;
 
    // compute the falloff if inbetween the inner and outer cone
@@ -95,7 +95,7 @@ float intensity_spot(float3 world_normal, float4 world_position)
    float4 coefficient = lit(attenuation.x, attenuation.y, attenuation.w);
 
    // calculate spot attenuated intensity
-   attenuation = max(attenuation, constant_0.xxxx);
+   attenuation = max(attenuation, 0.0);
 
    return (attenuation.z * coefficient.z) * attenuation.x;
 }
@@ -107,7 +107,7 @@ Lighting calculate(float3 normals, float4 world_position,
 
    Lighting lighting;
 
-   lighting.diffuse = constant_0.x;
+   lighting.diffuse = 0.0;
    lighting.diffuse.rgb = ambient(world_normal) + static_diffuse_lighting.rgb;
 
 #ifdef LIGHTING_DIRECTIONAL
@@ -146,14 +146,14 @@ Lighting calculate(float3 normals, float4 world_position,
 
    float scale = max(lighting.diffuse.r, lighting.diffuse.g);
    scale = max(scale, lighting.diffuse.z);
-   scale = max(scale, constant_0.z);
+   scale = max(scale, 1.0);
    scale = rcp(scale);
    lighting.diffuse.rgb *= scale;
    lighting.diffuse.rgb *= hdr_info.zzz;
 #else // LIGHTING_DIRECTIONAL
 
    lighting.diffuse = hdr_info.zzzw;
-   lighting.static_diffuse = constant_0.xxxx;
+   lighting.static_diffuse = 0.0;
 #endif
 
    return lighting;

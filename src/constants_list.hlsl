@@ -5,12 +5,6 @@
 // pcredvertexshaderconstants.h. Along with the comments on the contents
 // of the constants.
 
-// (0.0, 0.5, 1.0, -1.0) 
-float4 constant_0 : register(vs, c[0]);
-
-// (2.0, 0.25, 0.5, index_decompress = 765.001) 
-float4 constant_1 : register(vs, c[1]);
-
 // world space to projection space matrix
 float4x4 projection_matrix : register(vs, c[2]);
 

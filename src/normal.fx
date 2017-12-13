@@ -55,7 +55,7 @@ Vs_output unlit_opaque_vs(Vs_input input)
 
    output.color.rgb = hdr_info.z * lighting_constant.x + lighting_constant.y;
    output.color.rgb *= material_color.rgb;
-   output.color.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }
@@ -123,7 +123,7 @@ Vs_output near_opaque_vs(Vs_input input)
 
    output.color.rgb = lighting.diffuse.rgb * lighting_constant.x + lighting_constant.y;
    output.color.rgb *= material_color.rgb;
-   output.color.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }
@@ -182,7 +182,7 @@ Vs_shadow_output near_opaque_shadow_projectedtex_vs(Vs_input input)
 
    output.color.rgb = lighting.diffuse.rgb * lighting_constant.x + lighting_constant.y;
    output.color.rgb *= material_color.rgb;
-   output.color.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }

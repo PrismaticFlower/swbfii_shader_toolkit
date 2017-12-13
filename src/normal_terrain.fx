@@ -50,8 +50,8 @@ Vs_blendmap_output diffuse_blendmap_vs(Vs_input input)
 
    output.color_0.b = input.normal.w;
    output.color_0.g = input.position.w * terrain_constant.w;
-   output.color_0.r = constant_0.z;
-   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color_0.r = 1.0;
+   output.color_0.a = near_scene.fade * 0.25 + 0.5;
 
    float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
@@ -113,7 +113,7 @@ Vs_detail_output detailing_vs(Vs_input input)
    Near_scene near_scene = calculate_near_scene_fade(world_position);
 
    output.fog = calculate_fog(near_scene, world_position);
-   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color_0.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }

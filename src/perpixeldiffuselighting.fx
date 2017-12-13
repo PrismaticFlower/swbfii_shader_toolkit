@@ -51,10 +51,10 @@ Binormals generate_birnormals(float3 world_normal)
    Binormals binormals;
 
    //Pandemic's note: we rely on the fact that the object is world axis aligned
-   binormals.s = -world_normal.x * world_normal + constant_0.zxx;
+   binormals.s = -world_normal.x * world_normal + float3(1.0, 0.0, 0.0);
    binormals.s *= rsqrt(binormals.s.x);
 
-   binormals.t = -world_normal.z * world_normal + constant_0.xxz;
+   binormals.t = -world_normal.z * world_normal + float3(0.0, 0.0, 1.0);
    binormals.t *= rsqrt(binormals.t.z);
 
    return binormals;

@@ -34,7 +34,7 @@ float4 calculate_world_normal(float3 normal)
    world_normal.y = dot(normal, get_world_matrix_row(1).xyz);
    world_normal.z = dot(normal, get_world_matrix_row(2).xyz);
 
-   return float4(world_normal, constant_0.z);
+   return float4(world_normal, 1.0);
 }
 
 Vs_output near_vs(Vs_input input)
@@ -61,7 +61,7 @@ Vs_output near_vs(Vs_input input)
    output.fog = calculate_fog(near_scene, world_position);
 
    output.color.rgb = get_material_color(input.color).rgb;
-   output.color.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }
