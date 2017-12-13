@@ -15,27 +15,12 @@ struct Vs_output
    float4 position : POSITION;
    float2 base_texcoords : TEXCOORD0;
    float2 foam_texcoords : TEXCOORD1;
-   float4 normal_texcoords : TEXCOORD2;
+   float3 normal_texcoords : TEXCOORD2;
    float4 color : COLOR;
    float1 fog : FOG;
 };
 
 float4 texcoord_transform[2] : register(vs, c[CUSTOM_CONST_MIN]);
-
-sampler base_sampler;
-sampler foam_sampler;
-sampler normalization_sampler;
-
-float4 calculate_world_normal(float3 normal)
-{
-   float3 world_normal;
-
-   world_normal.x = dot(normal, get_world_matrix_row(0).xyz);
-   world_normal.y = dot(normal, get_world_matrix_row(1).xyz);
-   world_normal.z = dot(normal, get_world_matrix_row(2).xyz);
-
-   return float4(world_normal, 1.0);
-}
 
 Vs_output near_vs(Vs_input input)
 {
@@ -47,10 +32,7 @@ Vs_output near_vs(Vs_input input)
 
    output.base_texcoords = texcoords;
    output.foam_texcoords = texcoords;
-
-   float3 normals = decompress_normals(input.normals);
-
-   output.normal_texcoords = calculate_world_normal(normals);
+   output.normal_texcoords = normals_to_world(decompress_normals(input.normals));
 
    float4 world_position = transform::position(input.position);
 
@@ -87,6 +69,9 @@ float4 light_vector : register(ps, c[0]);
 float4 light_color : register(ps, c[1]);
 float4 ambient_color : register(ps, c[2]);
 
+sampler2D base_sampler;
+sampler2D foam_sampler;
+samplerCUBE normalization_sampler;
 
 float4 near_ps(Ps_input input) : COLOR
 {
