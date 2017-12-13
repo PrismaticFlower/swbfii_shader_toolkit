@@ -471,16 +471,18 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
                      light_point_23_def, nulldef});
 
       // Direction Lights + Spot Light
-      add_variation(unskinned | light_dir_spot, {unskinned_def, light_spot_def, nulldef});
+      add_variation(unskinned | light_dir_spot,
+                    {unskinned_def, light_dir_def, light_spot_def, nulldef});
 
       // Directional Lights + Point Light + Spot Light
-      add_variation(unskinned | light_dir_point_spot,
-                    {unskinned_def, light_point_def, light_spot_def, nulldef});
+      add_variation(
+         unskinned | light_dir_point_spot,
+         {unskinned_def, light_dir_def, light_point_def, light_spot_def, nulldef});
 
       // Directional Lights + 2 Point Lights + Spot Light
-      add_variation(
-         unskinned | light_dir_point2_spot,
-         {unskinned_def, light_point_def, light_spot_def, light_point_1_def, nulldef});
+      add_variation(unskinned | light_dir_point2_spot,
+                    {unskinned_def, light_dir_def, light_point_def, light_spot_def,
+                     light_point_1_def, nulldef});
    }
 
    // Unskinned Lighting Vertexcolor Definitions
@@ -505,16 +507,17 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
 
       // Direction Lights + Spot Light
       add_variation(unskinned | vertexcolor | light_dir_spot,
-                    {unskinned_def, color_def, light_spot_def, nulldef});
+                    {unskinned_def, color_def, light_dir_def, light_spot_def, nulldef});
 
       // Directional Lights + Point Light + Spot Light
       add_variation(unskinned | vertexcolor | light_dir_point_spot,
-                    {unskinned_def, color_def, light_point_def, light_spot_def, nulldef});
+                    {unskinned_def, color_def, light_dir_def, light_point_def,
+                     light_spot_def, nulldef});
 
       // Directional Lights + 2 Point Lights + Spot Light
       add_variation(unskinned | vertexcolor | light_dir_point2_spot,
-                    {unskinned_def, color_def, light_point_def, light_spot_def,
-                     light_point_1_def, nulldef});
+                    {unskinned_def, color_def, light_dir_def, light_point_def,
+                     light_spot_def, light_point_1_def, nulldef});
    }
 
    // Skinned Lighting Definitions
@@ -538,16 +541,17 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
 
       // Direction Lights + Spot Light
       add_variation(Vs_flags::skinned | light_dir_spot,
-                    {skinned_def, light_spot_def, nulldef});
+                    {skinned_def, light_dir_def, light_spot_def, nulldef});
 
       // Directional Lights + Point Light + Spot Light
-      add_variation(Vs_flags::skinned | light_dir_point_spot,
-                    {skinned_def, light_point_def, light_spot_def, nulldef});
+      add_variation(
+         Vs_flags::skinned | light_dir_point_spot,
+         {skinned_def, light_dir_def, light_point_def, light_spot_def, nulldef});
 
       // Directional Lights + 2 Point Lights + Spot Light
-      add_variation(
-         Vs_flags::skinned | light_dir_point2_spot,
-         {skinned_def, light_point_def, light_spot_def, light_point_1_def, nulldef});
+      add_variation(Vs_flags::skinned | light_dir_point2_spot,
+                    {skinned_def, light_dir_def, light_point_def, light_spot_def,
+                     light_point_1_def, nulldef});
    }
 
    // Skinned Lighting Vertexcolor Definitions
@@ -572,16 +576,17 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
 
       // Direction Lights + Spot Light
       add_variation(Vs_flags::skinned | vertexcolor | light_dir_spot,
-                    {skinned_def, color_def, light_spot_def, nulldef});
+                    {skinned_def, color_def, light_dir_def, light_spot_def, nulldef});
 
       // Directional Lights + Point Light + Spot Light
       add_variation(Vs_flags::skinned | vertexcolor | light_dir_point_spot,
-                    {skinned_def, color_def, light_point_def, light_spot_def, nulldef});
+                    {skinned_def, color_def, light_dir_def, light_point_def,
+                     light_spot_def, nulldef});
 
       // Directional Lights + 2 Point Lights + Spot Light
       add_variation(Vs_flags::skinned | vertexcolor | light_dir_point2_spot,
-                    {skinned_def, color_def, light_point_def, light_spot_def,
-                     light_point_1_def, nulldef});
+                    {skinned_def, color_def, light_dir_def, light_point_def,
+                     light_spot_def, light_point_1_def, nulldef});
    }
 
    return variations;
