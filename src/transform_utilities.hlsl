@@ -80,7 +80,7 @@ float3x4 get_bone_matrix(int index)
 //! \return The soft skin transformation matrix of the vertex.
 float3x4 calculate_skin(float4 weights, uint4 vertex_indices)
 {
-   int3 indices = vertex_indices.xyz * constant_1.www;
+   int3 indices = vertex_indices.xyz * 765.001;
    
    float3x4 skin;
 
@@ -109,7 +109,7 @@ float4 position(float4 position, uint4 indices, float4 weights)
 
    float3x4 skin = calculate_skin(weights, indices);
 
-   return float4(mul(skin, position), constant_0.z);
+   return float4(mul(skin, position), 1.0);
 }
 
 //! \brief Decompress and transform a skinned vertex normal to object
@@ -171,13 +171,13 @@ namespace hard_skinned
 //! \return The object space position of the vertex.
 float4 position(float4 position, uint4 indices)
 {
-   int index = indices.x * constant_1.w;
+   int index = indices.x * 765.001;
 
    position = decompress_position(position);
 
    float3x4 skin = soft_skinned::get_bone_matrix(index);
 
-   return float4(mul(skin, position), constant_0.z);
+   return float4(mul(skin, position), 1.0);
 }
 
 //! \brief Decompress and transform a hard skinned vertex normal 
@@ -189,7 +189,7 @@ float4 position(float4 position, uint4 indices)
 //! \return The object space normal of the vertex.
 float3 normals(float3 normals, uint4 indices)
 {
-   int index = indices.x * constant_1.w;
+   int index = indices.x * 765.001;
 
    normals = decompress_normals(normals);
 
@@ -210,7 +210,7 @@ float3 normals(float3 normals, uint4 indices)
 //! \return The object space binormals of the vertex.
 Binormals binormals(float3 binormal, float3 tangent, uint4 indices)
 {
-   int index = indices.x * constant_1.w;
+   int index = indices.x * 765.001;
 
    Binormals binormals = decompress_binormals(binormal, tangent);
 

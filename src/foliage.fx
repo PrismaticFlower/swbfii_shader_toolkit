@@ -43,7 +43,7 @@ Vs_output opaque_vs(Vs_input input)
    float4 material_color = get_material_color(input.color);
 
    output.color.xyz = material_color.xyz * hdr_info.zzz;
-   output.color.w = near_scene.fade * constant_1.y + constant_1.z;
+   output.color.w = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }

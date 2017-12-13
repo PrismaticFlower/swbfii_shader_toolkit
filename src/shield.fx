@@ -49,7 +49,7 @@ Vs_output shield_vs(Vs_input input)
    float angle_alpha_factor = rcp(value);
    value = dot(eye_to_vertex[0], eye_to_vertex[1]);
    angle_alpha_factor *= value;
-   angle_alpha_factor = angle_alpha_factor * -constant_0.y + constant_0.y;
+   angle_alpha_factor = angle_alpha_factor * -0.5 + 0.5;
    angle_alpha_factor *= shield_constants[3].z;
    angle_alpha_factor = -angle_alpha_factor * material_diffuse_color.w + material_diffuse_color.w;
 
@@ -63,8 +63,8 @@ Vs_output shield_vs(Vs_input input)
 
    // calculate specular color
    float eye_dot_normal = dot(world_normal.xyz, -light_directional_0_dir.xyz);
-   eye_dot_normal = (eye_dot_normal >= constant_0.x) ? 1.0f : 0.0f;
-   eye_dot_normal *= ((eye_to_vertex[0].w >= constant_0.x) ? 1.0f : 0.0f);
+   eye_dot_normal = (eye_dot_normal >= 0.0) ? 1.0f : 0.0f;
+   eye_dot_normal *= ((eye_to_vertex[0].w >= 0.0) ? 1.0f : 0.0f);
 
    float3 specular_color = eye_dot_normal * shield_constants[0].xyz;
 

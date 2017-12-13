@@ -37,8 +37,8 @@ Vs_screenspace_output screenspace_vs(Vs_input input)
 
    position.xy = position.xy + -hdr_constant.zw;
    position.xy *= 2.0;
-   position.xy = position.xy * constant_0.zw + constant_0.wz;
-   position.zw = constant_0.yz;
+   position.xy = position.xy * float2(1.0, -1.0) + float2(-1.0, 1.0);
+   position.zw = float2(0.5, 1.0);
 
    output.position = position;
 
@@ -65,8 +65,8 @@ Vs_bloomfilter_output bloomfilter_vs(Vs_input input)
 
    position.xy = position.xy + -hdr_constant.zw;
    position.xy *= 2.0;
-   position.xy = position.xy * constant_0.zw + constant_0.wz;
-   position.zw = constant_0.yz;
+   position.xy = position.xy * float2(1.0, -1.0) + float2(-1.0, 1.0);
+   position.zw = float2(0.5, 1.0);
 
    output.position = position;
 

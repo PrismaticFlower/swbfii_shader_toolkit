@@ -25,7 +25,7 @@ Vs_output filtercopy_vs(Vs_input input)
    Vs_output output;
 
    output.position.xy = input.position.xy;
-   output.position.zw = constant_0.yz;
+   output.position.zw = float2(0.5, 1.0);
 
    float2 texcoords = decompress_texcoords(input.texcoord);
 

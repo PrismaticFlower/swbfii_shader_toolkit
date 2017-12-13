@@ -50,8 +50,8 @@ Vs_blendmap_output diffuse_blendmap_vs(Vs_input input)
 
    output.color_0.b = input.normal.w;
    output.color_0.g = input.position.w * terrain_constant.w;
-   output.color_0.r = constant_0.z;
-   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color_0.r = 1.0;
+   output.color_0.a = near_scene.fade * 0.25 + 0.5;
 
    float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
@@ -113,7 +113,7 @@ Vs_detail_output detailing_vs(Vs_input input)
    Near_scene near_scene = calculate_near_scene_fade(world_position);
 
    output.fog = calculate_fog(near_scene, world_position);
-   output.color_0.a = near_scene.fade * constant_1.y + constant_1.z;
+   output.color_0.a = near_scene.fade * 0.25 + 0.5;
 
    return output;
 }
@@ -175,29 +175,28 @@ float4 detailing_ps(Ps_detail_input input, uniform sampler2D detail_maps[2],
                     uniform sampler2D projection_map, uniform sampler2D shadow_map) : COLOR
 {
 
-   float4 detail_color_0 = tex2D(detail_maps[0], input.detail_texcoord_0);
-   float4 detail_color_1 = tex2D(detail_maps[1], input.detail_texcoord_1);
-   float4 shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords);
-   float4 projection_color = tex2Dproj(projection_map, input.projection_texcoords);
+   float3 detail_color_0 = tex2D(detail_maps[0], input.detail_texcoord_0).rgb;
+   float3 detail_color_1 = tex2D(detail_maps[1], input.detail_texcoord_1).rgb;
+   float3 projection_color = tex2Dproj(projection_map, input.projection_texcoords).rgb;
+   float shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords).a;
 
    // HACK: Ignore projected cube maps.
    if (input.projection_texcoords.z != 0.0) {
       projection_color = 1.0;
    }
 
-   float3 color = projection_color.rgb * input.lighting_color.rgb;
-   float factor = lerp(0.8, shadow_map_color.a, 0.8);
+   float shadow = lerp(0.8, shadow_map_color, 0.8);
 
-   color = (color * factor) + input.proj_lighting.rgb;
+   float3 color = projection_color * input.proj_lighting.rgb;
+   color = (color * shadow) + input.lighting_color.rgb;
 
-   float detail_factor = input.lighting_color.a * (1 - shadow_map_color.a);
-   detail_factor = clamp(detail_factor, 0.0, 1.0);
-
-   float3 blended_detail = ((1 - detail_factor) * detail_color_0.rgb) * 2.0;
-   blended_detail *= detail_color_1.rgb;
-   blended_detail *= 2.0;
-
-   color *= blended_detail;
+   float detail_factor = input.lighting_color.a * (1 - shadow_map_color);
+   detail_factor = saturate(detail_factor);
+   
+   float3 blended_detail_color = (1 - detail_factor) * detail_color_0 * 2.0;
+   blended_detail_color = blended_detail_color * detail_color_1 * 2.0;
+   
+   color *= blended_detail_color;
 
    return float4(color, 1.0);
 }
