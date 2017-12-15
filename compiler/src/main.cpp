@@ -1,10 +1,12 @@
 
 #include <array>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
@@ -160,6 +162,10 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
 
 auto get_pass_flags(const nlohmann::json& pass_def) -> Pass_flags;
 
+auto embed_meta_data(std::string_view hlsl_path, std::string_view entry_point,
+                     std::string_view target, std::optional<Vs_flags> flags,
+                     Com_ptr<ID3DBlob> shader) -> Com_ptr<ID3DBlob>;
+
 constexpr D3D_SHADER_MACRO operator""_def(const char* chars, const std::size_t) noexcept
 {
    return {chars, ""};
@@ -270,15 +276,13 @@ auto compile_vertex_shader(
 
    cache[key] = static_cast<std::uint32_t>(vertex_shaders.size());
 
-   vertex_shaders.emplace_back();
-
    Com_ptr<ID3DBlob> error_message;
+   Com_ptr<ID3DBlob> shader;
 
-   auto result =
-      D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(), variation.first.data(),
-                 D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), target.data(),
-                 compiler_flags, NULL, vertex_shaders.back().clear_and_assign(),
-                 error_message.clear_and_assign());
+   auto result = D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(),
+                            variation.first.data(), D3D_COMPILE_STANDARD_FILE_INCLUDE,
+                            entry_point.data(), target.data(), compiler_flags, NULL,
+                            shader.clear_and_assign(), error_message.clear_and_assign());
 
    if (result != S_OK) {
       throw std::runtime_error{static_cast<char*>(error_message->GetBufferPointer())};
@@ -286,6 +290,11 @@ auto compile_vertex_shader(
    else if (error_message) {
       std::cout << static_cast<char*>(error_message->GetBufferPointer());
    }
+
+   shader = embed_meta_data(hlsl_path, entry_point, target, variation.second,
+                            std::move(shader));
+
+   vertex_shaders.emplace_back(std::move(shader));
 
    return cache[key];
 }
@@ -306,15 +315,13 @@ auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
 
    cache[key] = static_cast<std::uint32_t>(pixel_shaders.size());
 
-   pixel_shaders.emplace_back();
-
    Com_ptr<ID3DBlob> error_message;
+   Com_ptr<ID3DBlob> shader;
 
-   auto result =
-      D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(), nullptr,
-                 D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(), target.data(),
-                 compiler_flags, NULL, pixel_shaders.back().clear_and_assign(),
-                 error_message.clear_and_assign());
+   auto result = D3DCompile(hlsl.data(), hlsl.length(), hlsl_path.data(), nullptr,
+                            D3D_COMPILE_STANDARD_FILE_INCLUDE, entry_point.data(),
+                            target.data(), compiler_flags, NULL,
+                            shader.clear_and_assign(), error_message.clear_and_assign());
 
    if (result != S_OK) {
       throw std::runtime_error{static_cast<char*>(error_message->GetBufferPointer())};
@@ -322,6 +329,11 @@ auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
    else if (error_message) {
       std::cout << static_cast<char*>(error_message->GetBufferPointer());
    }
+
+   shader =
+      embed_meta_data(hlsl_path, entry_point, target, std::nullopt, std::move(shader));
+
+   pixel_shaders.emplace_back(std::move(shader));
 
    return cache[key];
 }
@@ -631,4 +643,62 @@ auto get_pass_flags(const nlohmann::json& pass_def) -> Pass_flags
    if (pass_def["texture_coords"]) set_flag(Pass_flags::texcoords);
 
    return flags;
+}
+
+auto embed_meta_data(std::string_view hlsl_path, std::string_view entry_point,
+                     std::string_view target, std::optional<Vs_flags> flags,
+                     Com_ptr<ID3DBlob> shader) -> Com_ptr<ID3DBlob>
+{
+   using Path = std::experimental::filesystem::path;
+
+   const Path path{std::cbegin(hlsl_path), std::cend(hlsl_path)};
+
+   nlohmann::json meta;
+
+   meta["name"s] = path.stem().u8string();
+   meta["entry_point"s] = entry_point.data();
+   meta["target"s] = target.data();
+
+   if (flags) meta["vs_flags"s] = static_cast<std::uint32_t>(*flags);
+
+   auto meta_buffer = nlohmann::json::to_msgpack(meta);
+
+   const auto bytecode_words = static_cast<DWORD*>(shader->GetBufferPointer());
+   const auto bytecode_size = shader->GetBufferSize() / sizeof(DWORD);
+
+   const auto meta_size =
+      (meta_buffer.size() / sizeof(DWORD)) + (meta_buffer.size() % sizeof(DWORD));
+
+   if (meta_size >= 100000) {
+      throw std::runtime_error{"Shader meta data too large to embed in bytecode."};
+   }
+
+   std::vector<DWORD> bytecode;
+   bytecode.reserve(bytecode_size + 3 + meta_size);
+
+   bytecode.emplace_back(bytecode_words[0]);
+
+   // comment 0xFFFE
+   bytecode.emplace_back((0xFFFEu) | ((meta_size + 2u) << 16u));
+   bytecode.emplace_back(static_cast<DWORD>("META"_mn));
+   bytecode.emplace_back(static_cast<DWORD>(meta_buffer.size()));
+
+   const auto meta_start = bytecode.size();
+
+   bytecode.resize(bytecode.size() + meta_size);
+
+   std::memcpy(&bytecode[meta_start], meta_buffer.data(), meta_buffer.size());
+
+   for (auto i = 1ui32; i < bytecode_size; ++i) {
+      bytecode.emplace_back(bytecode_words[i]);
+   }
+
+   Com_ptr<ID3DBlob> new_shader;
+
+   checked_invoke(S_OK, D3DCreateBlob, bytecode.size() * 4,
+                  new_shader.clear_and_assign());
+
+   std::memcpy(new_shader->GetBufferPointer(), bytecode.data(), bytecode.size() * 4);
+
+   return new_shader;
 }
