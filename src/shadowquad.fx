@@ -9,7 +9,7 @@ float4 shadowquad_vs(float4 position : POSITION) : POSITION
 
 }
 
-float4 shadowquad_ps(uniform float4 constant : register(ps, c[0])) : COLOR
+float4 shadowquad_ps(uniform float4 intensity : register(ps, c[0])) : COLOR
 {
-   return constant;
+   return intensity.aaaa;
 }

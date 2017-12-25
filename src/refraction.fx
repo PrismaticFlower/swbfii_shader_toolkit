@@ -36,8 +36,8 @@ Vs_nodistortion_output far_vs(Vs_input input,
    float3 normals = transform::normals(input.normals, input.blend_indices,
                                        input.weights);
 
-   Lighting lighting = light::diffuse::calculate(normals, world_position,
-                                                 get_static_diffuse_color(input.color));
+   Lighting lighting = light::calculate(normals, world_position.xyz,
+                                        get_static_diffuse_color(input.color));
 
    output.color = get_material_color(input.color);
    output.color.rgb *= lighting.diffuse.rgb;
@@ -69,8 +69,8 @@ Vs_nodistortion_output nodistortion_vs(Vs_input input,
    float3 normals = transform::normals(input.normals, input.blend_indices,
                                        input.weights);
 
-   Lighting lighting = light::diffuse::calculate(normals, world_position,
-                                                 get_static_diffuse_color(input.color));
+   Lighting lighting = light::calculate(normals, world_position.xyz,
+                                        get_static_diffuse_color(input.color));
 
    output.color = get_material_color(input.color);
    output.color.rgb *= lighting.diffuse.rgb;
@@ -114,8 +114,8 @@ Vs_distortion_output distortion_vs(Vs_input input,
    output.projection_texcoords = mul(world_position, light_proj_matrix);
    output.projection_texcoords.z = output.projection_texcoords.w;
 
-   Lighting lighting = light::diffuse::calculate(normals, world_position,
-                                                 get_static_diffuse_color(input.color));
+   Lighting lighting = light::calculate(normals, world_position.xyz,
+                                        get_static_diffuse_color(input.color));
 
    float4 material_color = get_material_color(input.color);
    float3 projection_color;

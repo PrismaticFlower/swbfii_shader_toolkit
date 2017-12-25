@@ -56,8 +56,7 @@ Vs_blendmap_output diffuse_blendmap_vs(Vs_input input)
    float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
 
-   Lighting lighting = light::diffuse::calculate(normals, world_position,
-                                                 static_diffuse_color);
+   Lighting lighting = light::calculate(normals, world_position.xyz, static_diffuse_color);
 
    output.color_0.r = lighting.diffuse.w;
    output.color_1.rgb = lighting.diffuse.rgb * terrain_constant.xxx + terrain_constant.yyy;
@@ -99,9 +98,7 @@ Vs_detail_output detailing_vs(Vs_input input)
    float3 normals = decompress_normals(input.normal.xyz);
    float4 static_diffuse_color = get_static_diffuse_color(input.color);
 
-   Lighting lighting = light::diffuse::calculate(normals,
-                                                 world_position,
-                                                 static_diffuse_color);
+   Lighting lighting = light::calculate(normals, world_position.xyz, static_diffuse_color);
 
    float4 material_color = get_material_color(input.color);
 
@@ -178,7 +175,7 @@ float4 detailing_ps(Ps_detail_input input, uniform sampler2D detail_maps[2],
    float3 detail_color_0 = tex2D(detail_maps[0], input.detail_texcoord_0).rgb;
    float3 detail_color_1 = tex2D(detail_maps[1], input.detail_texcoord_1).rgb;
    float3 projection_color = tex2Dproj(projection_map, input.projection_texcoords).rgb;
-   float shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords).a;
+   float shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords).r;
 
    // HACK: Ignore projected cube maps.
    if (input.projection_texcoords.z != 0.0) {

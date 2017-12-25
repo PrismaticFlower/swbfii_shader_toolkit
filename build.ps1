@@ -27,11 +27,12 @@ function file_changed($file)
 function include_file_changed()
 {
     $constants_list = file_changed (Get-Item "src/constants_list.hlsl")
+    $ext_constants_list = file_changed (Get-Item "src/ext_constants_list.hlsl")
     $lighting_utilities = file_changed (Get-Item "src/lighting_utilities.hlsl")
     $transform_utilities = file_changed (Get-Item "src/transform_utilities.hlsl")
     $vertex_utilities = file_changed (Get-Item "src/vertex_utilities.hlsl")
 
-    $constants_list -or $lighting_utilities -or $transform_utilities -or $vertex_utilities
+    $constants_list -or $ext_constants_list -or $lighting_utilities -or $transform_utilities -or $vertex_utilities
 }
 
 $munge_all = include_file_changed
