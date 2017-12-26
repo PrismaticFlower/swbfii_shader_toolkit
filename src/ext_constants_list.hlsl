@@ -2,13 +2,12 @@
 #define EXT_CONSTANTS_LIST_INCLUDED
 
 // the resolution of the render target
-float2 render_target_resolution : register(ps, c[10]);
+//float2 render_target_resolution : register(ps, c[10]);
 
-//static const float directional_lights = active_lights[0][0];
-//static const float point_light_0 = active_lights[0][1];
-//static const float point_light_1 = active_lights[0][2];
-//static const float point_light_23 = active_lights[0][3];
-//static const float spot_light = active_lights[1][0];
+float fog_enabled : register(vs, c[97]);
+
+float2 fog_range : register(ps, c[51]);
+float3 fog_color : register(ps, c[52]);
 
 bool directional_lights : register(b0);
 bool point_light_0 : register(b1);

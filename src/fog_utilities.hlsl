@@ -1,0 +1,23 @@
+#ifndef FOG_UTILS_INCLUDED
+#define FOG_UTILS_INCLUDED
+
+#include "constants_list.hlsl"
+#include "ext_constants_list.hlsl"
+
+namespace fog
+{
+
+float get_eye_distance(float3 world_position)
+{
+   return distance(world_view_position.xyz, world_position) * fog_enabled;
+}
+
+float3 apply(float3 color, float eye_distance)
+{
+   float fog = (fog_range.y - eye_distance) / (fog_range.y - fog_range.x);
+
+   return lerp(fog_color, color, fog);
+}
+
+}
+#endif
