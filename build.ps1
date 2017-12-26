@@ -28,7 +28,7 @@ function include_file_changed()
 {
     $constants_list = file_changed (Get-Item "src/constants_list.hlsl")
     $ext_constants_list = file_changed (Get-Item "src/ext_constants_list.hlsl")
-    $fog_utilities = file_changed (Get-Item "src/ext_constants_list.hlsl")
+    $fog_utilities = file_changed (Get-Item "src/fog_utilities.hlsl")
     $lighting_utilities = file_changed (Get-Item "src/lighting_utilities.hlsl")
     $transform_utilities = file_changed (Get-Item "src/transform_utilities.hlsl")
     $vertex_utilities = file_changed (Get-Item "src/vertex_utilities.hlsl")
