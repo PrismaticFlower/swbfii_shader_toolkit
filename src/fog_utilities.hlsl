@@ -9,14 +9,20 @@ namespace fog
 
 float get_eye_distance(float3 world_position)
 {
-   return distance(world_view_position.xyz, world_position) * fog_enabled;
+   return distance(world_view_position.xyz, world_position);
 }
 
 float3 apply(float3 color, float eye_distance)
 {
-   float fog = (fog_range.y - eye_distance) / (fog_range.y - fog_range.x);
+   if (fog_enabled) {
 
-   return lerp(fog_color, color, fog);
+      float fog = (fog_range.y - eye_distance) / (fog_range.y - fog_range.x);
+
+      return lerp(fog_color, color, fog);
+   }
+   else {
+      return color;
+   }
 }
 
 }
