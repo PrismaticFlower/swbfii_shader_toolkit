@@ -250,10 +250,6 @@ Pixel_lighting pixel_calculate(float3 world_normal, float3 world_position,
       light = float4(hdr_info.zzz, 1.0);
    }
 
-   Pixel_lighting lighting;
-   lighting.color = light.rgb;
-   lighting.intensity = light.a;
-
    Pixel_lighting result;
 
    result.color = light.rgb;
