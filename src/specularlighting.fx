@@ -1,5 +1,6 @@
 
 #include "constants_list.hlsl"
+#include "fog_utilities.hlsl"
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 #include "lighting_utilities.hlsl"
@@ -27,7 +28,6 @@ struct Vs_input
 struct Vs_normalmapped_ouput
 {
    float4 position : POSITION;
-   float1 fog : FOG;
 
    float2 texcoords : TEXCOORD0;
 
@@ -38,6 +38,7 @@ struct Vs_normalmapped_ouput
    float3 world_position : TEXCOORD4;
    float3 world_view_position : TEXCOORD5;
    float4 light_position : TEXCOORD6;
+   float1 fog_eye_distance : DEPTH;
 };
 
 Vs_normalmapped_ouput normalmapped_vs(Vs_input input,
@@ -51,7 +52,7 @@ Vs_normalmapped_ouput normalmapped_vs(Vs_input input,
    output.world_position = world_position.xyz;
    output.world_view_position = world_view_position.xyz;
    output.position = position_project(world_position);
-   output.fog = calculate_fog(world_position);
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -92,6 +93,7 @@ struct Vs_blinn_phong_ouput
 
    float3 envmap_coords : TEXCOORD7;
    bool envmapped : TEXCOORD8;
+   float1 fog_eye_distance : DEPTH;
 };
 
 Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
@@ -106,6 +108,7 @@ Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
    output.world_position = world_position.xyz;
    output.world_view_position = world_view_position.xyz;
    output.position = position_project(world_position);
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -136,7 +139,6 @@ Vs_blinn_phong_ouput blinn_phong_vs(Vs_input input,
 struct Vs_normalmapped_envmap_ouput
 {
    float4 position : POSITION;
-   float1 fog : FOG;
 
    float2 texcoords : TEXCOORD0;
    float3 normal : TEXCOORD1;
@@ -144,6 +146,7 @@ struct Vs_normalmapped_envmap_ouput
    float3 tangent : TEXCOORD3;
    float3 world_position : TEXCOORD4;
    float3 world_view_position : TEXCOORD5;
+   float1 fog_eye_distance : DEPTH;
 };
 
 Vs_normalmapped_envmap_ouput normalmapped_envmap_vs(Vs_input input)
@@ -156,7 +159,7 @@ Vs_normalmapped_envmap_ouput normalmapped_envmap_vs(Vs_input input)
    output.world_position = world_position.xyz;
    output.world_view_position = world_view_position.xyz;
    output.position = position_project(world_position);
-   output.fog = calculate_fog(world_position);
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -217,6 +220,8 @@ struct Ps_normalmapped_input
 
    // squared light radius in w or w = 0 if directional light
    float4 light_position : TEXCOORD6;
+
+   float1 fog_eye_distance : DEPTH;
 };
 
 float4 normalmapped_ps(Ps_normalmapped_input input,
@@ -242,6 +247,8 @@ float4 normalmapped_ps(Ps_normalmapped_input input,
    float gloss = lerp(1.0, normal_map_color.a, specular_color.a);
    float3 color = gloss * spec_color;
 
+   color = fog::apply(color, input.fog_eye_distance);
+
    return float4(color, normal_map_color.a);
 }
 
@@ -257,6 +264,8 @@ struct Ps_blinn_phong_input
 
    float3 envmap_coords : TEXCOORD7;
    bool envmapped : TEXCOORD8;
+
+   float1 fog_eye_distance : DEPTH;
 };
 
 float4 blinn_phong_ps(Ps_blinn_phong_input input, sampler2D diffuse_map,
@@ -291,6 +300,8 @@ float4 blinn_phong_ps(Ps_blinn_phong_input input, sampler2D diffuse_map,
 
    float3 envmap_color = texCUBE(envmap, input.envmap_coords).rgb * specular_color.rgb;
    float3 color = saturate(gloss * (envmap_color + spec_color));
+
+   color = fog::apply(color, input.fog_eye_distance);
 
    return float4(color, diffuse_alpha);
 }
@@ -327,6 +338,8 @@ struct Ps_normalmapped_envmap_input
    float3 tangent : TEXCOORD3;
    float3 world_position : TEXCOORD4;
    float3 world_view_position : TEXCOORD5;
+
+   float1 fog_eye_distance : DEPTH;
 };
 
 float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
@@ -349,6 +362,8 @@ float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
    float gloss = lerp(1.0, normal_map_color.a, specular_color.a);
 
    float3 color = gloss * light_color * specular_color.rgb * envmap_color;
+
+   color = fog::apply(color, input.fog_eye_distance);
 
    return float4(color, normal_map_color.a);
 }
