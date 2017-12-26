@@ -1,5 +1,6 @@
 
 #include "constants_list.hlsl"
+#include "fog_utilities.hlsl"
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 #include "lighting_utilities.hlsl"
@@ -80,6 +81,7 @@ struct Vs_input
 struct Vs_3lights_output
 {
    float4 position : POSITION;
+   float1 fog_eye_distance : DEPTH;
 
    float3 ambient_color : COLOR;
 
@@ -103,6 +105,7 @@ Vs_3lights_output lights_3_vs(Vs_input input)
 
    output.world_position = world_position.xyz;
    output.position = position_project(world_position);
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -180,7 +183,7 @@ float4 transform_spotlight_projection(float4 world_position)
 struct Vs_spotlight_output
 {
    float4 position : POSITION;
-   float1 fog : FOG;
+   float1 fog_eye_distance : DEPTH;
    float3 ambient_color : COLOR;
    float2 texcoords : TEXCOORD0;
 
@@ -204,7 +207,7 @@ Vs_spotlight_output spotlight_vs(Vs_input input)
 
    output.world_position = world_position.xyz;
    output.position = position_project(world_position);
-   output.fog = calculate_fog(world_position);
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    output.texcoords = decompress_transform_texcoords(input.texcoords,
                                                      texture_transforms[0],
@@ -273,6 +276,8 @@ struct Ps_3lights_input
    float3 world_position : TEXCOORD4;
 
    float4 light_positions[3] : TEXCOORD5;
+
+   float1 fog_eye_distance : DEPTH;
 };
 
 float4 light_colors[3] : register(ps, c[0]);
@@ -324,6 +329,8 @@ float4 lights_normalmap_ps(Ps_3lights_input input, sampler2D normal_map,
 
    color = saturate(color);
 
+   color = fog::apply(color, input.fog_eye_distance);
+
    return float4(color, 1.0);
 }
 
@@ -357,6 +364,8 @@ float4 lights_ps(Ps_3lights_input input, const int light_count)
 
    color = saturate(color);
 
+   color = fog::apply(color, input.fog_eye_distance);
+
    return float4(color, 1.0);
 }
 
@@ -389,6 +398,8 @@ struct Ps_spotlight_input
    float4 light_position : TEXCOORD5;
    float3 light_direction : TEXCOORD6;
    float4 projection_coords : TEXCOORD7;
+
+   float1 fog_eye_distance : DEPTH;
 };
 
 float3 calculate_spotlight(float3 world_position, float3 world_normal, 
@@ -426,6 +437,8 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input,
                                 input.light_direction, light_colors[0], projection_color);
    color = saturate(color);
 
+   color = fog::apply(color, input.fog_eye_distance);
+
    return float4(color, 1.0);
 }
 
@@ -439,6 +452,8 @@ float4 spotlight_ps(Ps_spotlight_input input,
    color += calculate_spotlight(input.world_position, input.normal, input.light_position, 
                                 input.light_direction, light_colors[0], projection_color);
    color = saturate(color);
+
+   color = fog::apply(color, input.fog_eye_distance);
 
    return float4(color, 1.0);
 }
