@@ -1,4 +1,6 @@
 
+#include "ext_constants_list.hlsl"
+#include "fog_utilities.hlsl"
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 
@@ -13,7 +15,7 @@ struct Vs_normal_output
 {
    float4 position : POSITION;
    float4 color : COLOR;
-   float fog : FOG;
+   float fog_eye_distance : DEPTH;
    float2 texcoords : TEXCOORD;
 };
 
@@ -27,9 +29,9 @@ Vs_normal_output normal_vs(Vs_normal_input input,
    float4 position = position_project(world_position);
 
    output.position = position;
+   output.particle_depth = output.position.z;
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
-   output.fog = calculate_fog(near_scene, world_position);
 
    near_scene = clamp_near_scene_fade(near_scene);
    near_scene.fade *= near_scene.fade;
@@ -61,7 +63,7 @@ struct Vs_blur_output
 {
    float4 position : POSITION;
    float4 color : COLOR;
-   float  fog : FOG;
+   float fog_eye_distance : DEPTH;
    float2 texcoords : TEXCOORD0;
    float4 blur_texcoords : TEXCOORD1;
 };
@@ -77,9 +79,9 @@ Vs_blur_output blur_vs(Vs_blur_input input,
    float4 position = position_project(world_position);
 
    output.position = position;
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
-   output.fog = calculate_fog(near_scene, world_position);
 
    near_scene = clamp_near_scene_fade(near_scene);
 
@@ -107,15 +109,20 @@ Vs_blur_output blur_vs(Vs_blur_input input,
 struct Ps_normal_input
 {
    float4 color : COLOR;
-   float2 texcoords : TEXCOORD;
+   float2 texcoords : TEXCOORD0;
+   float fog_eye_distance : DEPTH;
+   float pixel_position : VPOS;
 };
 
-float4 normal_ps(Ps_normal_input input,
-                 uniform sampler2D diffuse_map) : COLOR
+float4 normal_ps(Ps_normal_input input, uniform sampler2D diffuse_map) : COLOR
 {
    float4 diffuse_color = tex2D(diffuse_map, input.texcoords);
 
-   return diffuse_color * input.color;
+   float4 color = diffuse_color * input.color;
+
+   color.rgb = fog::apply(color.rgb, input.fog_eye_distance);
+
+   return color;
 }
 
 struct Ps_blur_input
@@ -123,6 +130,7 @@ struct Ps_blur_input
    float4 color : COLOR;
    float2 texcoords : TEXCOORD0;
    float4 blur_texcoords : TEXCOORD1;
+   float fog_eye_distance : DEPTH;
 };
 
 float4 blur_ps(Ps_blur_input input,
@@ -136,6 +144,8 @@ float4 blur_ps(Ps_blur_input input,
 
    color.rgb = refraction_color.rgb * input.color.rgb;
    color.a = alpha * input.color.a;
+
+   color.rgb = fog::apply(color.rgb, input.fog_eye_distance);
 
    return color;
 }

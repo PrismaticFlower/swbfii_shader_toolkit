@@ -7,6 +7,8 @@
 float2 fog_range : register(ps, c[51]);
 float3 fog_color : register(ps, c[52]);
 
+float2 resolution : register(ps, c[53]);
+
 bool directional_lights : register(b0);
 bool point_light_0 : register(b1);
 bool point_light_1 : register(b2);
