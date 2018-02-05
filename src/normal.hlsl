@@ -10,6 +10,7 @@ sampler2D diffuse_map : register(ps, s[0]);
 sampler2D detail_map : register(ps, s[1]);
 sampler2D projected_texture : register(ps, s[2]);
 sampler2D shadow_map : register(ps, s[3]);
+sampler2D ao_map : register(ps, s[4]);
 
 float4 blend_constant : register(ps, c[0]);
 float4 shadow_blend : register(ps, c[1]);
@@ -73,6 +74,7 @@ Vs_output_unlit unlit_transparent_vs(Vs_input input)
    Vs_output_unlit output = unlit_opaque_vs(input);
     
    Near_scene near_scene = calculate_near_scene_fade(world_position);
+   near_scene = clamp_near_scene_fade(near_scene);
 
    output.color.a = get_material_color(input.color).a * near_scene.fade;
 
@@ -201,7 +203,7 @@ Vs_full_output near_transparent_shadow_projectedtex_vs(Vs_input input)
    Near_scene near_scene = calculate_near_scene_fade(float4(output.world_position, 1.0));
 
    near_scene = clamp_near_scene_fade(near_scene);
-   near_scene.fade *= near_scene.fade;
+   // near_scene.fade *= near_scene.fade;
 
    float4 material_color = get_material_color(input.color);
 
@@ -250,7 +252,7 @@ float4 unlit_opaque_hardedged_ps(Ps_input_unlit input) : COLOR
    color = blended_color * blend_constant.a + color;
 
    if (diffuse_color.a > 0.5) color.a = input.color.a - 0.5;
-   else color.a = -0.01;
+   else color.a = 0.0;
 
    color.a *= 4.0;
 
@@ -272,6 +274,8 @@ float4 unlit_transparent_ps(Ps_input_unlit input) : COLOR
 
    color.rgb = fog::apply(color.rgb, input.fog_eye_distance);
 
+   color.a = saturate(color.a);
+
    return color;
 }
 
@@ -284,7 +288,7 @@ float4 unlit_transparent_hardedged_ps(Ps_input_unlit input) : COLOR
 
    float alpha = diffuse_color.a * input.color.a;
 
-   if (diffuse_color.a > 0.5) color.a = alpha;
+   if (diffuse_color.a > 0.5) color.a = saturate(alpha);
    else color.a = 0.0;
 
    color.rgb = (diffuse_color * input.color).rgb;
@@ -329,12 +333,14 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
    const float3 detail_color = tex2D(detail_map, input.detail_texcoords).rgb;
    const float3 projected_color = tex2Dproj(projected_texture, input.projection_texcoords).rgb;
    const float shadow_map_color = tex2Dproj(shadow_map, input.shadow_texcoords).r;
+   const float ao = tex2Dproj(ao_map, input.shadow_texcoords).r;
 
    // Calculate lighting.
    Pixel_lighting light = light::pixel_calculate(normalize(input.world_normal), input.world_position,
                                                  input.precalculated_light.rgb);
    light.color = light.color * lighting_factor.x + lighting_factor.y;
    light.color *= input.color.rgb;
+   light.color *= ao;
 
    float4 color = 0.0;
 
@@ -371,6 +377,8 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
       color.a = (input.color.a - 0.5) * 4.0;
    }
 
+   color.a = saturate(color.a);
+
    color.rgb = fog::apply(color.rgb, input.fog_eye_distance);
 
    return color;
@@ -390,6 +398,8 @@ float4 main_transparent_ps(Ps_input input, const State state) : COLOR
       color.a = lerp(1.0, diffuse_color.a, blend_constant.b);
       color.a *= input.color.a;
    }
+
+   color.a = saturate(color.a);
 
    return color;
 }

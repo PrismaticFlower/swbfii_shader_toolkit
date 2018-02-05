@@ -149,14 +149,14 @@ Lighting calculate(float3 normals, float3 world_position,
    lighting.diffuse.rgb += -light_proj_color.rgb * lighting.static_diffuse.w;
 
    float scale = max(lighting.diffuse.r, lighting.diffuse.g);
-   scale = max(scale, lighting.diffuse.z);
+   scale = max(scale, lighting.diffuse.b);
    scale = max(scale, 1.0);
    scale = rcp(scale);
    lighting.diffuse.rgb *= scale;
-   lighting.diffuse.rgb *= hdr_info.zzz;
+   lighting.diffuse.rgb *= hdr_info.z;
 #else // LIGHTING_DIRECTIONAL
 
-   lighting.diffuse = hdr_info.zzzw;
+   lighting.diffuse = float4(1.0.xxx, 0.0);
    lighting.static_diffuse = 0.0;
 #endif
 
@@ -192,9 +192,10 @@ Lighting vertex_precalculate(float3 world_normal, float3 world_position,
    lighting.static_diffuse = static_diffuse_lighting;
    lighting.static_diffuse.w = dot(light_proj_selector, intensity);
    lighting.diffuse.rgb += -light_proj_color.rgb * lighting.static_diffuse.w;
+
 #else // LIGHTING_DIRECTIONAL
 
-   lighting.diffuse = hdr_info.zzzw;
+   lighting.diffuse = float4(1.0.xxx, 0.0);
    lighting.static_diffuse = 0.0;
 #endif
 
@@ -247,7 +248,7 @@ Pixel_lighting pixel_calculate(float3 world_normal, float3 world_position,
       light.rgb *= hdr_info.z;
    }
    else {
-      light = float4(hdr_info.zzz, 1.0);
+      light = 1.0;
    }
 
    Pixel_lighting result;

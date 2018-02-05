@@ -22,7 +22,7 @@ struct Ps_textured_input
    float2 texcoord : TEXCOORD;
 };
 
-sampler diffuse_map;
+sampler2D diffuse_map;
 
 Vs_textured_output flare_textured_vs(Vs_textured_input input)
 {

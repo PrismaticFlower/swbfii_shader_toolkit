@@ -17,6 +17,7 @@ struct Vs_normal_output
    float4 color : COLOR;
    float fog_eye_distance : DEPTH;
    float2 texcoords : TEXCOORD;
+   float depth : TEXCOORD1;
 };
 
 Vs_normal_output normal_vs(Vs_normal_input input,
@@ -29,7 +30,8 @@ Vs_normal_output normal_vs(Vs_normal_input input,
    float4 position = position_project(world_position);
 
    output.position = position;
-   output.particle_depth = output.position.z;
+   output.fog_eye_distance = fog::get_eye_distance(world_position.xyz);
+   output.depth = position.z;
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
 
@@ -110,15 +112,34 @@ struct Ps_normal_input
 {
    float4 color : COLOR;
    float2 texcoords : TEXCOORD0;
+   float depth : TEXCOORD1;
    float fog_eye_distance : DEPTH;
-   float pixel_position : VPOS;
+   float2 pixel_position : VPOS;
 };
 
-float4 normal_ps(Ps_normal_input input, uniform sampler2D diffuse_map) : COLOR
+const static float contrast_power = 2.0;
+const static float softness_scale = 0.5;
+
+float contrast(float input)
+{
+   float result = 0.5 * pow(saturate(2 * ((input > 0.5) ? 1 - input : input)),
+                            contrast_power);
+   result = (input > 0.5) ? 1 - result : result;
+
+   return result;
+}
+
+float4 normal_ps(Ps_normal_input input, uniform sampler2D diffuse_map, 
+                 uniform sampler2D depth_map : register(s4)) : COLOR
 {
    float4 diffuse_color = tex2D(diffuse_map, input.texcoords);
+   float depth = tex2D(depth_map, input.pixel_position / resolution).r;
+
+   float zdiff = (depth - input.depth);
+   float c = contrast(zdiff * softness_scale);
 
    float4 color = diffuse_color * input.color;
+   // color.a *= c;
 
    color.rgb = fog::apply(color.rgb, input.fog_eye_distance);
 
