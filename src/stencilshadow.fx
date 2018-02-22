@@ -139,7 +139,7 @@ float4 extend_directional_softskin_gen_normal_vs(Vs_input_generate_normal input,
 float4 extrude_point(float4 world_position, float3 world_normal, float3 light_position,
                      float light_radius, float extrusion_offset)
 {
-   float3 light_direction = world_normal.xyz - light_position.xyz;
+   float3 light_direction = world_position.xyz - light_position.xyz;
 
    float dir_dot = dot(light_direction, light_direction);
    float dir_dot_sqr = rsqrt(dir_dot);
@@ -151,8 +151,7 @@ float4 extrude_point(float4 world_position, float3 world_normal, float3 light_po
 
    float normal_dot = dot(world_normal.xyz, -light_direction);
 
-   if (normal_dot >= 0.0) normal_dot = 1.0f;
-   else normal_dot = 0.0f;
+   normal_dot = (normal_dot >= 0.0) ? 1.0 : 0.0;
 
    normal_dot = normal_dot * extrude_amount + extrusion_offset;
 
