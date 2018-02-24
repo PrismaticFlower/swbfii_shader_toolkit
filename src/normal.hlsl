@@ -10,7 +10,6 @@ sampler2D diffuse_map : register(ps, s[0]);
 sampler2D detail_map : register(ps, s[1]);
 sampler2D projected_texture : register(ps, s[2]);
 sampler2D shadow_map : register(ps, s[3]);
-sampler2D ao_map : register(ps, s[4]);
 
 float4 blend_constant : register(ps, c[0]);
 float4 shadow_blend : register(ps, c[1]);
@@ -333,14 +332,12 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
    const float3 detail_color = tex2D(detail_map, input.detail_texcoords).rgb;
    const float3 projected_color = tex2Dproj(projected_texture, input.projection_texcoords).rgb;
    const float shadow_map_color = tex2Dproj(shadow_map, input.shadow_texcoords).r;
-   const float ao = tex2Dproj(ao_map, input.shadow_texcoords).r;
 
    // Calculate lighting.
    Pixel_lighting light = light::pixel_calculate(normalize(input.world_normal), input.world_position,
                                                  input.precalculated_light.rgb);
    light.color = light.color * lighting_factor.x + lighting_factor.y;
    light.color *= input.color.rgb;
-   light.color *= ao;
 
    float4 color = 0.0;
 
