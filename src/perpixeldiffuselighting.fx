@@ -416,7 +416,7 @@ float3 calculate_spotlight(float3 world_position, float3 world_normal,
    attenuation -= light_distance * light_distance / (range * range);
    attenuation = saturate(attenuation);
 
-   return attenuation * (projection_color * light_color.rgb);
+   return attenuation * (intensity * light_color.rgb) * projection_color;
 }
 
 float4 spotlight_normalmap_ps(Ps_spotlight_input input,

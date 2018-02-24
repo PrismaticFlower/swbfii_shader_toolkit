@@ -204,9 +204,7 @@ float3 calculate_blinn_phong(float3 normal, float3 view_normal, float3 world_pos
    float specular_angle = max(dot(half_vector, normal), 0.0);
    float specular = pow(specular_angle, exponent);
 
-   float3 blended_specular_color = saturate((specular_color + light_color) / 2);
-
-   return attenuation * (blended_specular_color * specular);
+   return attenuation * (specular_color * light_color * specular);
 }
 
 struct Ps_normalmapped_input
@@ -343,7 +341,8 @@ struct Ps_normalmapped_envmap_input
 };
 
 float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
-                              uniform sampler2D normal_map, uniform samplerCUBE envmap,
+                              uniform sampler2D normal_map, 
+                              uniform samplerCUBE envmap : register(ps, s[3]),
                               uniform float4 specular_color : register(ps, c[0]),
                               uniform float3 light_color : register(ps, c[2])) : COLOR
 {
@@ -360,8 +359,7 @@ float4 normalmapped_envmap_ps(Ps_normalmapped_envmap_input input,
    float3 envmap_color = texCUBE(envmap, envmap_coords).rgb;
 
    float gloss = lerp(1.0, normal_map_color.a, specular_color.a);
-
-   float3 color = gloss * light_color * specular_color.rgb * envmap_color;
+   float3 color = light_color * envmap_color * gloss;
 
    color = fog::apply(color, input.fog_eye_distance);
 
