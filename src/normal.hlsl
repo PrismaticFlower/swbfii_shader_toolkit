@@ -331,7 +331,7 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
    const float4 diffuse_color = tex2D(diffuse_map, input.diffuse_texcoords);
    const float3 detail_color = tex2D(detail_map, input.detail_texcoords).rgb;
    const float3 projected_color = tex2Dproj(projected_texture, input.projection_texcoords).rgb;
-   const float shadow_map_color = tex2Dproj(shadow_map, input.shadow_texcoords).r;
+   const float shadow_map_color = tex2Dproj(shadow_map, input.shadow_texcoords).a;
 
    // Calculate lighting.
    Pixel_lighting light = light::pixel_calculate(normalize(input.world_normal), input.world_position,
@@ -343,7 +343,7 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
 
    // Calculate projected texture lighting.
    if (state.projected_tex && state.shadowed) {
-      float projection_shadow = lerp(1.0, 1.0 - shadow_map_color, shadow_blend.a);
+      float projection_shadow = lerp(1.0, shadow_map_color, shadow_blend.a);
       
       color.rgb = projected_color * input.projection_color * projection_shadow;
    }
