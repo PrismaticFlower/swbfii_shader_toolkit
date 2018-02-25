@@ -7,7 +7,10 @@
 float2 fog_range : register(ps, c[51]);
 float3 fog_color : register(ps, c[52]);
 
-float2 resolution : register(ps, c[53]);
+// world space to projection space matrix
+float4x4 ps_projection_matrix : register(ps, c[53]);
+
+float time : register(vs, c[97]);
 
 bool directional_lights : register(b0);
 bool point_light_0 : register(b1);

@@ -27,8 +27,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "projective_normal_map_vs",
-          "pixel_shader": "projective_normal_map_distorted_reflection_specular_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_distorted_reflection_specular_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -61,8 +61,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "projective_normal_map_vs",
-          "pixel_shader": "projective_normal_map_distorted_reflection_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_distorted_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -95,8 +95,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "projective_normal_map_vs",
-          "pixel_shader": "projective_normal_map_reflection_specular_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_reflection_specular_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -105,7 +105,7 @@
     },
 
     {
-      "name": "projective bumpmap without distortion",
+      "name": "normal map without distortion",
       "id": 3,
 
       "passes": [
@@ -129,8 +129,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "projective_normal_map_vs",
-          "pixel_shader": "projective_normal_map_reflection_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -139,7 +139,7 @@
     },
 
     {
-      "name": "blended bumpmaps with reflection with specular",
+      "name": "normal map with reflection with specular",
       "id": 4,
 
       "passes": [
@@ -163,8 +163,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "blended_normal_maps_output_vs",
-          "pixel_shader": "blended_normal_maps_reflection_specular_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_reflection_specular_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -173,7 +173,7 @@
     },
 
     {
-      "name": "blended bumpmaps with reflection",
+      "name": "normal map with reflection",
       "id": 5,
 
       "passes": [
@@ -197,8 +197,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "blended_normal_maps_output_vs",
-          "pixel_shader": "blended_normal_maps_reflection_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -207,7 +207,7 @@
     },
 
     {
-      "name": "blended bumpmaps without reflection with specular",
+      "name": "normal map without reflection with specular",
       "id": 6,
 
       "passes": [
@@ -231,8 +231,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "blended_normal_maps_output_vs",
-          "pixel_shader": "blended_normal_maps_specular_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -241,7 +241,7 @@
     },
 
     {
-      "name": "blended bumpmaps without reflection",
+      "name": "normal map without reflection",
       "id": 7,
 
       "passes": [
@@ -265,8 +265,8 @@
           "texture_coords": true,
           "transform": "normals",
 
-          "vertex_shader": "blended_normal_maps_output_vs",
-          "pixel_shader": "blended_normal_maps_ps",
+          "vertex_shader": "normal_map_vs",
+          "pixel_shader": "normal_map_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
