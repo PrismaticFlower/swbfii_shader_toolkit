@@ -12,7 +12,7 @@ float4 texture_transforms[8] : register(vs, c[CUSTOM_CONST_MIN + 3]);
 const static float wave_length = 0.1;
 const static float wave_height = 0.1;
 const static float2 water_direction = {0.5, 1.0};
-const static float time_scale = 0.002500;
+const static float time_scale = 0.003333;
 
 struct Vs_fade_output
 {
