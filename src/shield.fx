@@ -1,6 +1,12 @@
 
+#include "ext_constants_list.hlsl"
 #include "vertex_utilities.hlsl"
+#include "pixel_utilities.hlsl"
 #include "transform_utilities.hlsl"
+
+float3 specular_color : register(c[CUSTOM_CONST_MIN]);
+float4 shield_constants : register(c[CUSTOM_CONST_MIN + 3]);
+float2 near_scene_fade_scale : register(c[CUSTOM_CONST_MIN + 4]);
 
 struct Vs_input
 {
@@ -15,16 +21,12 @@ struct Vs_output
    float fog : FOG;
 
    float4 color : COLOR0;
-   float3 specular_color : COLOR1;
+   float fade : COLOR1;
 
-   float2 diffuse_coords : TEXCOORD0;
-   float4 specular_coords : TEXCOORD1;
+   float2 texcoords : TEXCOORD0;
+   float3 world_normal : TEXCOORD1;
+   float3 view_normal : TEXCOORD2;
 };
-
-float4 shield_constants[4] : register(vs, c[CUSTOM_CONST_MIN]);
-
-sampler diffuse_map;
-sampler specular_spot;
 
 Vs_output shield_vs(Vs_input input)
 {
@@ -33,86 +35,84 @@ Vs_output shield_vs(Vs_input input)
    float3 world_normal = normals_to_world(decompress_normals(input.normals));
    float4 world_position = transform::position(input.position);
 
-   float4 eye_to_vertex[2];
-   eye_to_vertex[1].w = 1.0;
-
-   // calculate the reflected eye-to-vertex vector
-   eye_to_vertex[1].xyz = world_position.xyz + -world_view_position.xyz;
-   eye_to_vertex[0].w = dot(-eye_to_vertex[1].xyz, world_normal.xyz);
-   eye_to_vertex[0].xyz = eye_to_vertex[0].w * world_normal.xyz + eye_to_vertex[1].xyz;
-   eye_to_vertex[0].xyz = eye_to_vertex[0].w * world_normal.xyz + eye_to_vertex[0].xyz;
-
-   // calculate the view angle alpha factor
-   float value = dot(eye_to_vertex[1], eye_to_vertex[1]);
-   value = max(value, shield_constants[3].w);
-   
-   float angle_alpha_factor = rcp(value);
-   value = dot(eye_to_vertex[0], eye_to_vertex[1]);
-   angle_alpha_factor *= value;
-   angle_alpha_factor = angle_alpha_factor * -0.5 + 0.5;
-   angle_alpha_factor *= shield_constants[3].z;
-   angle_alpha_factor = -angle_alpha_factor * material_diffuse_color.w + material_diffuse_color.w;
-
-   // calculate specular spot map projected coordinates
-   float3 specular_coords;
-   specular_coords.x = dot(eye_to_vertex[0].xyz, shield_constants[1].xyz);
-   specular_coords.y = dot(eye_to_vertex[0].xyz, shield_constants[2].xyz);
-   specular_coords.z = dot(eye_to_vertex[0].xyz, light_directional_0_dir.xyz);
-
-   output.specular_coords = specular_coords.xyzz + specular_coords.zzzz;
-
-   // calculate specular color
-   float eye_dot_normal = dot(world_normal.xyz, -light_directional_0_dir.xyz);
-   eye_dot_normal = (eye_dot_normal >= 0.0) ? 1.0f : 0.0f;
-   eye_dot_normal *= ((eye_to_vertex[0].w >= 0.0) ? 1.0f : 0.0f);
-
-   float3 specular_color = eye_dot_normal * shield_constants[0].xyz;
-
+   output.world_normal = world_normal;
    output.position = transform::position_project(input.position);
 
-   float2 texcoords = decompress_texcoords(input.texcoords);
+   float3 view_normal = world_position.xyz - world_view_position.xyz;
+   float view_distance = length(view_normal);
+   view_normal = normalize(view_normal);
 
-   output.diffuse_coords = texcoords + shield_constants[3].xy;
+   float3 reflected_view_normal = reflect(view_normal, world_normal);
+
+   float view_angle = dot(reflected_view_normal, reflected_view_normal);
+   view_angle = max(view_angle, shield_constants.w);
+   
+   float angle_alpha_factor = rcp(view_angle);
+   view_angle = dot(view_normal, reflected_view_normal);
+   angle_alpha_factor *= view_angle;
+   angle_alpha_factor = angle_alpha_factor * -0.5 + 0.5;
+   angle_alpha_factor *= max(shield_constants.z, 1.0);
+   angle_alpha_factor = -angle_alpha_factor * material_diffuse_color.w + material_diffuse_color.w;
+
+   output.view_normal = view_normal;
+   output.texcoords = decompress_texcoords(input.texcoords) + shield_constants.xy;
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
    output.fog = calculate_fog(near_scene, world_position);
 
+   near_scene.fade = near_scene.fade * near_scene_fade_scale.x + near_scene_fade_scale.y;
    near_scene = clamp_near_scene_fade(near_scene);
    near_scene.fade = near_scene.fade * angle_alpha_factor;
 
-   specular_color *= near_scene.fade;
-   output.specular_color = specular_color * hdr_info.zzz;
+   output.fade = near_scene.fade * angle_alpha_factor;
 
-   output.color.rgb = material_diffuse_color.rgb * hdr_info.zzz;
-   output.color.a = material_diffuse_color.a * near_scene.fade;
-
+   output.color.rgb = material_diffuse_color.rgb;
+   output.color.a = material_diffuse_color.a;
+   
    return output;
 }
+
+sampler2D diffuse_map : register(ps, s0);
+sampler2D normal_map : register(ps, s8);
+sampler2D refraction_texture : register(ps, s9);
 
 struct Ps_input
 {
    float4 color : COLOR0;
-   float3 specular_color : COLOR1;
+   float fade : COLOR1;
 
-   float2 diffuse_coords : TEXCOORD0;
-   float2 specular_coords : TEXCOORD1;
+   float2 texcoords : TEXCOORD0;
+   float3 world_normal : TEXCOORD1;
+   float3 view_normal : TEXCOORD2;
 };
 
-float4 shield_ps(Ps_input input) : COLOR
+float4 shield_ps(Ps_input input, float2 position : VPOS) : COLOR
 {
-   float4 diffuse_color = tex2D(diffuse_map, input.diffuse_coords);
-   float3 specular_color = tex2D(specular_spot, input.specular_coords).rgb;
+   float3 view_normal = normalize(input.view_normal);
+   float3 world_normal = normalize(input.world_normal);
 
-   specular_color *= input.specular_color;
+   float3 normal = perturb_normal(normal_map, input.texcoords, world_normal, view_normal);
+
+   float2 scene_coords = position * rt_resolution.zw + normal.xy * 0.1;
+   float3 scene_color = tex2D(refraction_texture, scene_coords).rgb;
+   float4 diffuse_color = tex2D(diffuse_map, input.texcoords);
+
+   float3 half_vector = normalize(view_normal - light_directional_0_dir.xyz);
+
+   float specular_angle = max(dot(half_vector, normal), 0.0);
+   float3 specular = pow(specular_angle, 64);
+
+   specular = specular * specular_color;
 
    float alpha_value = diffuse_color.a + 0.49;
 
-   if (alpha_value <= 0.5) specular_color = float3(0.0, 0.0, 0.0);
+   if (alpha_value <= 0.5) specular = 0.0;
 
-   float4 color = diffuse_color * input.color;
+   float3 color = material_diffuse_color.rgb;
 
-   color.rgb = color.rgb * color.a + specular_color;
-   color.a = diffuse_color.a;
+   float alpha = material_diffuse_color.a * diffuse_color.a;
 
-   return color;
+   color = (color * alpha + specular) * hdr_info.z;
+
+   return float4(color + scene_color, input.fade);
 }
