@@ -13,38 +13,12 @@ float4 light_constants[7] : register(vs, c[21]);
 
 // helper functions for constants
 
-float4 get_light_position(const uint light)
-{
-   if (light == 0) return light_constants[0];
-   if (light == 1) return light_constants[2];
-   if (light == 2) return light_constants[4];
+const static float4 light_positions[3] = { light_constants[0], light_constants[2], light_constants[4] };
+const static float4 light_params[3] = { light_constants[1], light_constants[3], light_constants[5] };
 
-   return float4(0.0, 0.0, 0.0, 1.0);
-}
-
-float4 get_light_params(const uint light)
-{
-   if (light == 0) return light_constants[1];
-   if (light == 1) return light_constants[3];
-   if (light == 2) return light_constants[5];
-
-   return float4(0.0, 0.0, 0.0, 1.0);
-}
-
-float4 get_spotlight_position()
-{
-   return light_constants[0];
-}
-
-float4 get_spotlight_params()
-{
-   return light_constants[1];
-}
-
-float4 get_spotlight_direction()
-{
-   return light_constants[2];
-}
+const static float4 spotlight_position =  light_constants[0];
+const static float4 spotlight_params = light_constants[1];
+const static float3 spotlight_direction = light_constants[2].xyz;
 
 Binormals generate_birnormals(float3 world_normal)
 {
@@ -128,11 +102,8 @@ Vs_3lights_output lights_3_vs(Vs_input input)
    output.ambient_color = ambient_light * light_ambient_color_top.a;
 
    for (int i = 0; i < 3; ++i) {
-      output.light_positions[i].xyz = get_light_position(i).xyz;
-
-      const float4 light_params = get_light_params(i);
-
-      output.light_positions[i].w = get_light_radius(light_params);
+      output.light_positions[i].xyz = light_positions[i].xyz;
+      output.light_positions[i].w = get_light_radius(light_params[i]);
    }
 
    return output;
@@ -158,11 +129,6 @@ Vs_3lights_output lights_3_genbinormals_terrain_vs(Vs_input input)
    output.texcoords.y = dot(float4(output.world_position, 1.0), texture_transforms[1].xzyw);
 
    return output;
-}
-
-float get_spotlight_range()
-{
-   return (1.0 / get_spotlight_params().x) * get_spotlight_params().y;
 }
 
 float4 transform_spotlight_projection(float4 world_position)
@@ -229,9 +195,9 @@ Vs_spotlight_output spotlight_vs(Vs_input input)
    ambient_light += static_diffuse_color.rgb;
    output.ambient_color = ambient_light * light_ambient_color_top.a;
 
-   output.light_position.xyz = get_spotlight_position().xyz;
-   output.light_position.w = get_spotlight_range();  
-   output.light_direction.xyz = get_spotlight_direction().xyz;
+   output.light_position.xyz = spotlight_position.xyz;
+   output.light_position.w = get_light_radius(spotlight_params);
+   output.light_direction = spotlight_direction;
 
    output.projection_coords = transform_spotlight_projection(world_position);
 
