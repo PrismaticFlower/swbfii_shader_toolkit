@@ -1,4 +1,4 @@
-﻿#ifndef PIXEL_UTILS_INCLUDED
+#ifndef PIXEL_UTILS_INCLUDED
 #define PIXEL_UTILS_INCLUDED
 
 // Christian Schüler's Normal Mapping Without Precomputed Tangents code.

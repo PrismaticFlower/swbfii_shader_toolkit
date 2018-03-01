@@ -232,7 +232,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_ps",
+          "pixel_shader": "normal_map_specular_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
