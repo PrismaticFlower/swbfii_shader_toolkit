@@ -10,14 +10,14 @@
 
 float4 texture_transforms[2] : register(vs, c[CUSTOM_CONST_MIN]);
 
-float4 light_constants[7] : register(vs, c[21]);
+float4 light_constants[7] : register(c[21]);
 
 // helper functions for constants
 
 const static float4 light_positions[3] = { light_constants[0], light_constants[2], light_constants[4] };
 const static float4 light_params[3] = { light_constants[1], light_constants[3], light_constants[5] };
 
-const static float4 spotlight_position =  light_constants[0];
+const static float3 spotlight_position =  light_constants[0].xyz;
 const static float4 spotlight_params = light_constants[1];
 const static float3 spotlight_direction = light_constants[2].xyz;
 
@@ -66,8 +66,6 @@ struct Vs_3lights_output
    float3 tangent : TEXCOORD3;
 
    float3 world_position : TEXCOORD4;
-
-   float4 light_positions[3] : TEXCOORD5;
 };
 
 Vs_3lights_output lights_3_vs(Vs_input input)
@@ -103,11 +101,6 @@ Vs_3lights_output lights_3_vs(Vs_input input)
    float3 ambient_light = light::ambient(world_normals);
    ambient_light += static_diffuse_color.rgb;
    output.ambient_color = ambient_light * light_ambient_color_top.a;
-
-   for (int i = 0; i < 3; ++i) {
-      output.light_positions[i].xyz = light_positions[i].xyz;
-      output.light_positions[i].w = get_light_radius(light_params[i]);
-   }
 
    return output;
 }
@@ -158,10 +151,7 @@ struct Vs_spotlight_output
    float3 tangent : TEXCOORD3;
 
    float3 world_position : TEXCOORD4;
-
-   float4 light_position : TEXCOORD5;
-   float3 light_direction : TEXCOORD6;
-   float4 projection_coords : TEXCOORD7;
+   float4 projection_coords : TEXCOORD5;
 };
 
 Vs_spotlight_output spotlight_vs(Vs_input input)
@@ -197,10 +187,6 @@ Vs_spotlight_output spotlight_vs(Vs_input input)
    float3 ambient_light = light::ambient(world_normals);
    ambient_light += static_diffuse_color.rgb;
    output.ambient_color = ambient_light * light_ambient_color_top.a;
-
-   output.light_position.xyz = spotlight_position.xyz;
-   output.light_position.w = get_light_radius(spotlight_params);
-   output.light_direction = spotlight_direction;
 
    output.projection_coords = transform_spotlight_projection(world_position);
 
@@ -241,15 +227,13 @@ struct Ps_3lights_input
 
    float3 world_position : TEXCOORD4;
 
-   float4 light_positions[3] : TEXCOORD5;
-
    float1 fog_eye_distance : DEPTH;
 };
 
-float4 light_colors[3] : register(ps, c[0]);
+float3 light_colors[3] : register(ps, c[0]);
 
 float3 calculate_light(float3 world_position, float3 world_normal, float4 light_position,
-                       float4 light_color)
+                       float3 light_color, float radius)
 {
    float3 light_direction;
    float attenuation;
@@ -265,16 +249,14 @@ float3 calculate_light(float3 world_position, float3 world_normal, float4 light_
 
       light_direction = normalize(light_direction);
 
-      float radius = light_position.w;
-
-      attenuation = 1.0 - distance * distance / (radius * radius);
+      attenuation = 1.0 - (distance * distance) / (radius * radius);
       attenuation = saturate(attenuation);
       attenuation *= attenuation;
    }
 
    float intensity = max(dot(world_normal, light_direction), 0.0);
    
-   return attenuation * (intensity * light_color.rgb);
+   return attenuation * (intensity * light_color);
 }
 
 float4 lights_normalmap_ps(Ps_3lights_input input, sampler2D normal_map,
@@ -290,7 +272,8 @@ float4 lights_normalmap_ps(Ps_3lights_input input, sampler2D normal_map,
 
    for (int i = 0; i < light_count; ++i) {
       color += calculate_light(input.world_position, texel_normal, 
-                               input.light_positions[i], light_colors[i]);
+                               light_positions[i], light_colors[i], 
+                               get_light_radius(light_params[i]));
    }
 
    color = saturate(color);
@@ -325,7 +308,8 @@ float4 lights_ps(Ps_3lights_input input, const int light_count)
    for (int i = 0; i < light_count; ++i) {
 
       color += calculate_light(input.world_position, input.normal, 
-                               input.light_positions[i], light_colors[i]);
+                               light_positions[i], light_colors[i], 
+                               get_light_radius(light_params[i]));
    }
 
    color = saturate(color);
@@ -360,29 +344,26 @@ struct Ps_spotlight_input
    float3 tangent : TEXCOORD3;
 
    float3 world_position : TEXCOORD4;
-
-   float4 light_position : TEXCOORD5;
-   float3 light_direction : TEXCOORD6;
-   float4 projection_coords : TEXCOORD7;
+   float4 projection_coords : TEXCOORD5;
 
    float1 fog_eye_distance : DEPTH;
 };
 
 float3 calculate_spotlight(float3 world_position, float3 world_normal, 
-                           float4 light_position, float3 light_direction,
-                           float4 light_color, float3 projection_color)
+                           float3 light_position, float3 light_direction, 
+                           float3 light_color, float range,
+                           float3 projection_color)
 {
-   float3 light_normal = normalize(light_position.xyz - world_position);
+   float3 light_normal = normalize(light_position - world_position);
    float intensity = max(dot(world_normal, light_normal), 0.0);
 
-   float light_distance = distance(world_position, light_position.xyz);
-   float range = light_position.w;
+   float light_distance = distance(world_position, light_position);
 
    float attenuation = dot(light_direction, -light_normal);
    attenuation -= light_distance * light_distance / (range * range);
    attenuation = saturate(attenuation);
 
-   return attenuation * (intensity * light_color.rgb) * projection_color;
+   return attenuation * (intensity * light_color) * projection_color;
 }
 
 float4 spotlight_normalmap_ps(Ps_spotlight_input input,
@@ -399,8 +380,9 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input,
 
    float3 color = input.ambient_color;
 
-   color += calculate_spotlight(input.world_position, texel_normal, input.light_position,
-                                input.light_direction, light_colors[0], projection_color);
+   color += calculate_spotlight(input.world_position, texel_normal, spotlight_position,
+                                spotlight_direction, light_colors[0],
+                                get_light_radius(spotlight_params), projection_color);
    color = saturate(color);
 
    color = fog::apply(color, input.fog_eye_distance);
@@ -415,8 +397,9 @@ float4 spotlight_ps(Ps_spotlight_input input,
 
    float3 color = input.ambient_color;
 
-   color += calculate_spotlight(input.world_position, input.normal, input.light_position, 
-                                input.light_direction, light_colors[0], projection_color);
+   color += calculate_spotlight(input.world_position, input.normal, spotlight_position,
+                                spotlight_direction, light_colors[0],
+                                get_light_radius(spotlight_params), projection_color);
    color = saturate(color);
 
    color = fog::apply(color, input.fog_eye_distance);
