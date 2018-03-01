@@ -11,8 +11,6 @@ float4 texture_transforms[2] : register(vs, c[CUSTOM_CONST_MIN]);
 
 float4 light_constants[7] : register(vs, c[21]);
 
-// helper functions for constants
-
 const static float4 light_positions[3] = { light_constants[0], light_constants[2], light_constants[4] };
 const static float4 light_params[3] = { light_constants[1], light_constants[3], light_constants[5] };
 
