@@ -28,7 +28,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_distorted_reflection_specular_ps",
+          "pixel_shader": "normal_map_distorted_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -96,7 +96,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_specular_ps",
+          "pixel_shader": "normal_map_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -164,7 +164,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_specular_ps",
+          "pixel_shader": "normal_map_reflection_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -232,7 +232,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_specular_ps",
+          "pixel_shader": "normal_map_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -287,7 +287,7 @@
           "transform": "normals",
 
           "vertex_shader": "lowquality_vs",
-          "pixel_shader": "lowquality_ps",
+          "pixel_shader": "lowquality_specular_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
@@ -308,7 +308,7 @@
           "transform": "normals",
 
           "vertex_shader": "lowquality_vs",
-          "pixel_shader": "lowquality_specular_ps",
+          "pixel_shader": "lowquality_ps",
 
           "vs_target": "vs_2_0",
           "ps_target": "ps_2_0"
