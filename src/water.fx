@@ -91,8 +91,7 @@ struct Vs_normal_map_output
    float2 texcoords : TEXCOORD3;
 };
 
-Vs_normal_map_output normal_map_vs(float4 position : POSITION, float3 normal : NORMAL,
-                                   float4 compressed_texcoords : TEXCOORD)
+Vs_normal_map_output normal_map_vs(float4 position : POSITION, float3 normal : NORMAL)
 {
    Vs_normal_map_output output;
 
@@ -109,9 +108,10 @@ Vs_normal_map_output normal_map_vs(float4 position : POSITION, float3 normal : N
    output.projected_texcoords.z = 0.0;
    output.projected_texcoords.w = output.position.w;
 
-   float2 texcoords = decompress_transform_texcoords(compressed_texcoords,
-                                                     texture_transforms[0],
-                                                     texture_transforms[1]);
+   float2 texcoords = world_position.xz * 0.125;
+
+   texcoords.x = dot(float4(texcoords, 0, 1), texture_transforms[0]);
+   texcoords.y = dot(float4(texcoords, 0, 1), texture_transforms[1]);
 
    output.texcoords = texcoords * wave_length + time_scale * time * water_direction;
 
