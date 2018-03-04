@@ -110,7 +110,7 @@ Vs_detail_output detailing_vs(Vs_input input)
    output.projection_color *= light_proj_color.rgb;
 
    Near_scene near_scene = calculate_near_scene_fade(world_position);
-   output.fade = near_scene.fade * 0.25 + 0.5;
+   output.fade = saturate(near_scene.fade * 0.25 + 0.5);
 
    return output;
 }
@@ -234,19 +234,17 @@ float4 detailing_ps(Ps_detail_input input, uniform sampler2D detail_maps[2],
 
    float3 color;
 
-   float projection_shadow = lerp(1.0, 1.0 - shadow_map_color, 1.0);
+   float projection_shadow = lerp(0.8, shadow_map_color, 0.8);
 
    color = projected_color * input.projection_color * projection_shadow;
    color += light.color;
 
-   float shadow_value = (input.fade * light.intensity) * (1 - shadow_map_color);
-   shadow_value = saturate(shadow_value);
+   float shadow = 1 - (input.fade * (1 - shadow_map_color));
    
-   float3 blended_detail_color = detail_color_0 * 2.0;
-   blended_detail_color = blended_detail_color * detail_color_1 * 2.0;
+   float3 blended_detail_color = (detail_color_0 * shadow)  * 2.0;
+   blended_detail_color *=  (detail_color_1 * 2.0);
   
    color *= blended_detail_color;
-   color *= (1 - shadow_value);
 
    color = fog::apply(color, input.fog_eye_distance);
 
