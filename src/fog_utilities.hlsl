@@ -15,10 +15,9 @@ float get_eye_distance(float3 world_position)
 float3 apply(float3 color, float eye_distance)
 {
    if (fog_enabled) {
+      float fog = (fog_range.y - eye_distance) * fog_range.z;
 
-      float fog = (fog_range.y - eye_distance) / (fog_range.y - fog_range.x);
-
-      return lerp(fog_color, color, fog);
+      return lerp(fog_color, color, saturate(fog));
    }
    else {
       return color;

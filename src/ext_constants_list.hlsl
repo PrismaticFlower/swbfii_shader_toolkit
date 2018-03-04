@@ -1,10 +1,9 @@
 #ifndef EXT_CONSTANTS_LIST_INCLUDED
 #define EXT_CONSTANTS_LIST_INCLUDED
 
-// the resolution of the render target
-//float2 render_target_resolution : register(ps, c[10]);
 
-float2 fog_range : register(ps, c[51]);
+// x fog start, y = fog end, z = 1 / (fog end - fog start)
+float3 fog_range : register(ps, c[51]);
 float3 fog_color : register(ps, c[52]);
 
 // x = width, y = height, z = 1 / width, w = 1 / height
