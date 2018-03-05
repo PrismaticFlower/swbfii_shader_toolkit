@@ -38,7 +38,6 @@ normalmapadder.shader
 pervertexdiffuselighting.shader
 scroll.shader
 specmap.shader
-water.shader
 
 attenuation_volume.texture
 cube_normalizationmap.texture
