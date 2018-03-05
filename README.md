@@ -9,3 +9,8 @@ the [MessagePack](https://msgpack.org/index.html) format and is stored as the fi
 | entry_point  | `string` | The name of the entry point used for the shader. |
 | target  | `string` | The target profile used for the shader. |
 | vs_flags  | `uint` | (optional) The Vertex Shader flags used for this variation of the shader. |
+
+In addition a shader may define objects named "metadata" in it's json description. Any members of this objects
+will also be added to the embedded metadata. These objects can occur at the shader's root level, state level or
+pass level. With each level overriding keys from earlier levels. In all cases the keys listed in the above table
+always override any custom metadata set.
