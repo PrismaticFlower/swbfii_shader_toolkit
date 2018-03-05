@@ -203,7 +203,7 @@ void compile(std::string_view def_path, std::string_view hlsl_path,
 
    const std::string render_type = definition["rendertype"];
 
-   const auto metadata = definition["metadata"];
+   const auto metadata = definition.value("metadata", nlohmann::json::object());
 
    std::vector<Com_ptr<ID3DBlob>> vertex_shaders;
    std::vector<Com_ptr<ID3DBlob>> pixel_shaders;
