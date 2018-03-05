@@ -126,25 +126,29 @@ struct hash<std::pair<std::string_view, std::string_view>> {
 void compile(std::string_view def_path, std::string_view hlsl_path,
              std::string_view out_path);
 
-auto compile_state(const nlohmann::json& state_def, std::string_view hlsl_path,
-                   std::string_view hlsl, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+auto compile_state(const nlohmann::json& state_def, const nlohmann::json& parent_metadata,
+                   std::string_view hlsl_path, std::string_view hlsl,
+                   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
                    std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> State;
 
-auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
-                  std::string_view hlsl, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+auto compile_pass(const nlohmann::json& pass_def, const nlohmann::json& parent_metadata,
+                  std::string_view hlsl_path, std::string_view hlsl,
+                  std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
                   std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> Pass;
 
 // Not thread-safe, uses a static cache to boost compile times and reduce shader
 // sizes.
 auto compile_vertex_shader(
-   std::string_view hlsl_path, std::string_view hlsl, std::string_view entry_point,
-   std::string_view target, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+   const nlohmann::json& parent_metadata, std::string_view hlsl_path,
+   std::string_view hlsl, std::string_view entry_point, std::string_view target,
+   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
    const std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>& variation)
    -> std::uint32_t;
 
 // Not thread-safe, uses a static cache to boost compile times and reduce shader
 // sizes.
-auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
+auto compile_pixel_shader(const nlohmann::json& parent_metadata,
+                          std::string_view hlsl_path, std::string_view hlsl,
                           std::string_view entry_point, std::string_view target,
                           std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> std::uint32_t;
 
@@ -162,9 +166,10 @@ auto get_vs_variations(bool skinned, bool lighting, bool vertex_color)
 
 auto get_pass_flags(const nlohmann::json& pass_def) -> Pass_flags;
 
-auto embed_meta_data(std::string_view hlsl_path, std::string_view entry_point,
-                     std::string_view target, std::optional<Vs_flags> flags,
-                     Com_ptr<ID3DBlob> shader) -> Com_ptr<ID3DBlob>;
+auto embed_meta_data(const nlohmann::json& extra_metadata, std::string_view hlsl_path,
+                     std::string_view entry_point, std::string_view target,
+                     std::optional<Vs_flags> flags, Com_ptr<ID3DBlob> shader)
+   -> Com_ptr<ID3DBlob>;
 
 constexpr D3D_SHADER_MACRO operator""_def(const char* chars, const std::size_t) noexcept
 {
@@ -198,41 +203,51 @@ void compile(std::string_view def_path, std::string_view hlsl_path,
 
    const std::string render_type = definition["rendertype"];
 
+   const auto metadata = definition["metadata"];
+
    std::vector<Com_ptr<ID3DBlob>> vertex_shaders;
    std::vector<Com_ptr<ID3DBlob>> pixel_shaders;
    std::vector<State> states;
 
    for (const auto& state_def : definition["states"]) {
-      states.emplace_back(
-         compile_state(state_def, hlsl_path, hlsl, vertex_shaders, pixel_shaders));
+      states.emplace_back(compile_state(state_def, metadata, hlsl_path, hlsl,
+                                        vertex_shaders, pixel_shaders));
    }
 
    save_shader(render_type, out_path, vertex_shaders, pixel_shaders, states);
 }
 
-auto compile_state(const nlohmann::json& state_def, std::string_view hlsl_path,
-                   std::string_view hlsl, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+auto compile_state(const nlohmann::json& state_def, const nlohmann::json& parent_metadata,
+                   std::string_view hlsl_path, std::string_view hlsl,
+                   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
                    std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> State
 {
    State state{std::uint32_t{state_def["id"]}};
 
    auto& passes = state.passes;
 
+   auto metadata = state_def.value("metadata", nlohmann::json::object());
+   metadata.update(parent_metadata);
+
    for (const auto& pass_def : state_def["passes"]) {
-      passes.emplace_back(
-         compile_pass(pass_def, hlsl_path, hlsl, vertex_shaders, pixel_shaders));
+      passes.emplace_back(compile_pass(pass_def, metadata, hlsl_path, hlsl,
+                                       vertex_shaders, pixel_shaders));
    }
 
    return state;
 }
 
-auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
-                  std::string_view hlsl, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+auto compile_pass(const nlohmann::json& pass_def, const nlohmann::json& parent_metadata,
+                  std::string_view hlsl_path, std::string_view hlsl,
+                  std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
                   std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> Pass
 {
    Pass pass{};
 
    pass.flags = get_pass_flags(pass_def);
+
+   auto metadata = pass_def.value("metadata", nlohmann::json::object());
+   metadata.update(parent_metadata);
 
    const auto vs_variations = get_vs_variations(pass_def["skinned"], pass_def["lighting"],
                                                 pass_def["vertex_color"]);
@@ -247,18 +262,19 @@ auto compile_pass(const nlohmann::json& pass_def, std::string_view hlsl_path,
       pass.vs_shaders.emplace_back();
       pass.vs_shaders.back().flags = variation.second;
       pass.vs_shaders.back().index = compile_vertex_shader(
-         hlsl_path, hlsl, vs_entry_point, vs_target, vertex_shaders, variation);
+         metadata, hlsl_path, hlsl, vs_entry_point, vs_target, vertex_shaders, variation);
    }
 
-   pass.ps_index =
-      compile_pixel_shader(hlsl_path, hlsl, ps_entry_point, ps_target, pixel_shaders);
+   pass.ps_index = compile_pixel_shader(metadata, hlsl_path, hlsl, ps_entry_point,
+                                        ps_target, pixel_shaders);
 
    return pass;
 }
 
 auto compile_vertex_shader(
-   std::string_view hlsl_path, std::string_view hlsl, std::string_view entry_point,
-   std::string_view target, std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
+   const nlohmann::json& parent_metadata, std::string_view hlsl_path,
+   std::string_view hlsl, std::string_view entry_point, std::string_view target,
+   std::vector<Com_ptr<ID3DBlob>>& vertex_shaders,
    const std::pair<std::array<D3D_SHADER_MACRO, 8>, Vs_flags>& variation) -> std::uint32_t
 {
    using Cache_key_tuple =
@@ -291,15 +307,16 @@ auto compile_vertex_shader(
       std::cout << static_cast<char*>(error_message->GetBufferPointer());
    }
 
-   shader = embed_meta_data(hlsl_path, entry_point, target, variation.second,
-                            std::move(shader));
+   shader = embed_meta_data(parent_metadata, hlsl_path, entry_point, target,
+                            variation.second, std::move(shader));
 
    vertex_shaders.emplace_back(std::move(shader));
 
    return cache[key];
 }
 
-auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
+auto compile_pixel_shader(const nlohmann::json& parent_metadata,
+                          std::string_view hlsl_path, std::string_view hlsl,
                           std::string_view entry_point, std::string_view target,
                           std::vector<Com_ptr<ID3DBlob>>& pixel_shaders) -> std::uint32_t
 {
@@ -330,8 +347,8 @@ auto compile_pixel_shader(std::string_view hlsl_path, std::string_view hlsl,
       std::cout << static_cast<char*>(error_message->GetBufferPointer());
    }
 
-   shader =
-      embed_meta_data(hlsl_path, entry_point, target, std::nullopt, std::move(shader));
+   shader = embed_meta_data(parent_metadata, hlsl_path, entry_point, target, std::nullopt,
+                            std::move(shader));
 
    pixel_shaders.emplace_back(std::move(shader));
 
@@ -645,15 +662,16 @@ auto get_pass_flags(const nlohmann::json& pass_def) -> Pass_flags
    return flags;
 }
 
-auto embed_meta_data(std::string_view hlsl_path, std::string_view entry_point,
-                     std::string_view target, std::optional<Vs_flags> flags,
-                     Com_ptr<ID3DBlob> shader) -> Com_ptr<ID3DBlob>
+auto embed_meta_data(const nlohmann::json& extra_metadata, std::string_view hlsl_path,
+                     std::string_view entry_point, std::string_view target,
+                     std::optional<Vs_flags> flags, Com_ptr<ID3DBlob> shader)
+   -> Com_ptr<ID3DBlob>
 {
    using Path = std::experimental::filesystem::path;
 
    const Path path{std::cbegin(hlsl_path), std::cend(hlsl_path)};
 
-   nlohmann::json meta;
+   nlohmann::json meta = extra_metadata;
 
    meta["name"s] = path.stem().u8string();
    meta["entry_point"s] = entry_point.data();
