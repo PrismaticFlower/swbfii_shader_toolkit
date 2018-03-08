@@ -21,5 +21,8 @@ bool point_light_1 : register(b2);
 bool point_light_23 : register(b3);
 bool spot_light : register(b4);
 bool fog_enabled : register(b5);
+bool cube_map_light_projection : register(b6);
+
+uniform samplerCUBE cube_light_texture : register(s15);
 
 #endif

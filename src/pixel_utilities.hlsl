@@ -1,6 +1,8 @@
 #ifndef PIXEL_UTILS_INCLUDED
 #define PIXEL_UTILS_INCLUDED
 
+#include "ext_constants_list.hlsl"
+
 // Christian Schüler's Normal Mapping Without Precomputed Tangents code.
 // Taken from http://www.thetenthplanet.de/archives/1180, be sure to go
 // check out his article on it. 
@@ -44,6 +46,16 @@ float3 perturb_normal(sampler2D samp, float2 texcoord, float3 N, float3 V)
    return normalize(mul(map, TBN));
 }
 
-
+float3 sample_projected_light(sampler2D light_texture, float4 texcoords)
+{
+   if (cube_map_light_projection)
+   {
+      return texCUBEproj(cube_light_texture, texcoords).rgb;
+   }
+   else
+   {
+      return tex2Dproj(light_texture, texcoords).rgb;
+   }
+}
 
 #endif

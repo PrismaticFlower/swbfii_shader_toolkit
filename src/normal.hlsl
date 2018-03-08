@@ -5,6 +5,7 @@
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 #include "lighting_utilities.hlsl"
+#include "pixel_utilities.hlsl"
 
 sampler2D diffuse_map : register(ps, s[0]);
 sampler2D detail_map : register(ps, s[1]);
@@ -330,7 +331,8 @@ float4 main_opaque_ps(Ps_input input, const State state) : COLOR
 {
    const float4 diffuse_color = tex2D(diffuse_map, input.diffuse_texcoords);
    const float3 detail_color = tex2D(detail_map, input.detail_texcoords).rgb;
-   const float3 projected_color = tex2Dproj(projected_texture, input.projection_texcoords).rgb;
+   const float3 projected_color = sample_projected_light(projected_texture, 
+                                                         input.projection_texcoords);
    const float shadow_map_color = tex2Dproj(shadow_map, input.shadow_texcoords).a;
 
    // Calculate lighting.

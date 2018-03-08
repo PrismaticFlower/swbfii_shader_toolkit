@@ -4,6 +4,7 @@
 #include "vertex_utilities.hlsl"
 #include "transform_utilities.hlsl"
 #include "lighting_utilities.hlsl"
+#include "pixel_utilities.hlsl"
 
 // Disbale single loop iteration warning.
 #pragma warning(disable : 3557)
@@ -374,7 +375,8 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input,
                             texel_normal.y * input.binormal +
                             texel_normal.z * input.normal);
 
-   float3 projection_color = tex2Dproj(projection_map, input.projection_coords).rgb;
+   float3 projection_color = sample_projected_light(projection_map,
+                                                    input.projection_coords);
 
    float3 color = input.ambient_color;
 
@@ -391,7 +393,8 @@ float4 spotlight_normalmap_ps(Ps_spotlight_input input,
 float4 spotlight_ps(Ps_spotlight_input input,
                     uniform sampler2D projection_map : register(ps, s[2])) : COLOR
 {
-   float3 projection_color = tex2Dproj(projection_map, input.projection_coords).rgb;
+   float3 projection_color = sample_projected_light(projection_map,
+                                                    input.projection_coords);
 
    float3 color = input.ambient_color;
 

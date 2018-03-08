@@ -3,6 +3,7 @@
 #include "fog_utilities.hlsl"
 #include "vertex_utilities.hlsl"
 #include "lighting_utilities.hlsl"
+#include "pixel_utilities.hlsl"
 #include "transform_utilities.hlsl"
 
 // Disbale forced loop unroll warning.
@@ -221,7 +222,8 @@ float4 detailing_ps(Ps_detail_input input, uniform sampler2D detail_maps[2],
 
    float3 detail_color_0 = tex2D(detail_maps[0], input.detail_texcoords[0]).rgb;
    float3 detail_color_1 = tex2D(detail_maps[1], input.detail_texcoords[1]).rgb;
-   float3 projected_color = tex2Dproj(projection_map, input.projection_texcoords).rgb;
+   float3 projected_color = sample_projected_light(projection_map,
+                                                   input.projection_texcoords);
    float shadow_map_color = tex2Dproj(shadow_map, input.shadow_map_texcoords).a;
 
    // HACK: Ignore projected cube maps.
