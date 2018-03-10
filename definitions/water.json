@@ -14,11 +14,8 @@
           "texture_coords": false,
           "transform": "position",
 
-          "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "vertex_shader": "discard_vs",
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -28,10 +25,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_distorted_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_distorted_reflection_specular_ps"
         }
       ]
     },
@@ -48,11 +42,8 @@
           "texture_coords": false,
           "transform": "position",
 
-          "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "vertex_shader": "discard_vs",
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -62,10 +53,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_distorted_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_distorted_reflection_ps"
         }
       ]
     },
@@ -83,10 +71,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -96,10 +81,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_reflection_specular_ps"
         }
       ]
     },
@@ -117,10 +99,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -130,10 +109,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_reflection_ps"
         }
       ]
     },
@@ -151,10 +127,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -164,10 +137,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_reflection_specular_ps"
         }
       ]
     },
@@ -185,10 +155,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -198,10 +165,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_reflection_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_reflection_ps"
         }
       ]
     },
@@ -219,10 +183,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -232,10 +193,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_specular_ps"
         }
       ]
     },
@@ -253,10 +211,7 @@
           "transform": "position",
 
           "vertex_shader": "transmissive_pass_fade_vs",
-          "pixel_shader": "transmissive_pass_fade_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "transmissive_pass_fade_ps"
         },
         {
           "skinned": false,
@@ -266,10 +221,7 @@
           "transform": "normals",
 
           "vertex_shader": "normal_map_vs",
-          "pixel_shader": "normal_map_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "normal_map_ps"
         }
       ]
     },
@@ -287,10 +239,7 @@
           "transform": "normals",
 
           "vertex_shader": "lowquality_vs",
-          "pixel_shader": "lowquality_specular_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "lowquality_specular_ps"
         }
       ]
     },
@@ -308,10 +257,7 @@
           "transform": "normals",
 
           "vertex_shader": "lowquality_vs",
-          "pixel_shader": "lowquality_ps",
-
-          "vs_target": "vs_2_0",
-          "ps_target": "ps_2_0"
+          "pixel_shader": "lowquality_ps"
         }
       ]
     }
